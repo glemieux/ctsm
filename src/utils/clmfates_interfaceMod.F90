@@ -197,7 +197,7 @@ module CLMFatesInterfaceMod
    ! developer will at least question its usage (RGK)
    private :: hlm_bounds_to_fates_bounds
 
-   logical :: debug  = .false.
+   logical :: debug  = .true.
 
    character(len=*), parameter, private :: sourcefile = &
         __FILE__
@@ -616,6 +616,10 @@ contains
 
       call timemgr_datediff(reference_date, sec, current_date, current_tod, model_day)
 
+      if(debug)then
+         write(iulog,*) 'Called timemgr_datediff.  model_day = ', model_day
+      end if
+
       call timemgr_datediff(jan01_curr_year,0,current_date,sec,day_of_year)
       
       call SetFatesTime(current_year, current_month, &
@@ -624,6 +628,9 @@ contains
                         model_day, floor(day_of_year), &
                         days_per_year, 1.0_r8/dble(days_per_year))
 
+      if(debug)then
+         write(iulog,*) 'Called SetFatesTime.  model_day = ', model_day
+      end if
 
       do s=1,this%fates(nc)%nsites
 
