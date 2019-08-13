@@ -1712,6 +1712,7 @@ contains
     date2 = TimeSetymd( ymd2, tod2, "date2" )
     diff = date2 - date1
     call ESMF_TimeIntervalGet( diff, d_r8=days, rc=rc )
+    write(iulog,*) 'ESMF_TimeInterval days output:', days
     call chkrc(rc, sub//': error return from ESMF_TimeIntervalGet')
     days = days + 1.0_r8
 
