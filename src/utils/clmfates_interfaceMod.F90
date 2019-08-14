@@ -738,6 +738,7 @@ contains
       ! Part IV: 
       ! Update history IO fields that depend on ecosystem dynamics
       ! ---------------------------------------------------------------------------------
+      write(iulog,*) 'Calling update_history_dyn from dynamics_driv'
       call this%fates_hist%update_history_dyn( nc,                    &
                                               this%fates(nc)%nsites, &
                                               this%fates(nc)%sites) 
@@ -1185,6 +1186,7 @@ contains
                ! ------------------------------------------------------------------------
                ! Update history IO fields that depend on ecosystem dynamics
                ! ------------------------------------------------------------------------
+               write(iulog,*) 'Calling update_history_dyn from restart'
                call this%fates_hist%update_history_dyn( nc, &
                      this%fates(nc)%nsites,                 &
                      this%fates(nc)%sites) 
@@ -1299,6 +1301,7 @@ contains
            ! ------------------------------------------------------------------------
            ! Update history IO fields that depend on ecosystem dynamics
            ! ------------------------------------------------------------------------
+           write(iulog,*) 'Calling update_history_dyn from init_coldstart'
            call this%fates_hist%update_history_dyn( nc, &
                 this%fates(nc)%nsites,                 &
                 this%fates(nc)%sites) 
