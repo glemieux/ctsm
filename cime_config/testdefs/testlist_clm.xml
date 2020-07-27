@@ -1937,7 +1937,6 @@
   <test name="SMS_Lm6" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/Fates">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
-      <machine name="cheyenne" compiler="gnu" category="fates"/>
       <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
@@ -1948,6 +1947,7 @@
   <test name="SMS_Lm13" grid="1x1_brazil" compset="I2000Clm50FatesCruGs" testmods="clm/FatesColdDef">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="cheyenne" compiler="gnu" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
