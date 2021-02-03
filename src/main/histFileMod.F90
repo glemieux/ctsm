@@ -2245,14 +2245,6 @@ contains
     call ncd_defdim(lnfid, 'string_length', hist_dim_name_length, strlen_dimid)
     call ncd_defdim(lnfid, 'scale_type_string_length', scale_type_strlen, dimid)
     call ncd_defdim( lnfid, 'levdcmp', nlevdecomp_full, dimid)
-<<<<<<< HEAD
-
-||||||| 9db8e2ec
-    
-=======
-    
-
->>>>>>> c724747c062dadbbf12bfa9c2153d34c49f4410b
     if(use_fates)then
        call ncd_defdim(lnfid, 'fates_levscag', nlevsclass * nlevage, dimid)
        call ncd_defdim(lnfid, 'fates_levscagpf', nlevsclass * nlevage * numpft_fates, dimid)
