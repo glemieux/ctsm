@@ -1656,6 +1656,7 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
   <test name="SMS_Ld1" grid="f19_g17" compset="I2000Clm50BgcCru" testmods="clm/default">
     <machines>
       <machine name="cheyenne" compiler="intel" category="prebeta"/>
+      <machine name="edison" compiler="intel" category="prebeta"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
@@ -1877,6 +1878,15 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
       <machine name="cheyenne" compiler="intel" category="aux_clm"/>
       <machine name="izumi" compiler="nag" category="aux_clm"/>
       <machine name="cheyenne" compiler="gnu" category="aux_clm"/>
+      <machine name="cheyenne" compiler="gnu" category="prebeta"/>
+    </machines>
+    <options>
+      <option name="wallclock">00:20:00</option>
+    </options>
+  </test>
+  <test name="ERS_D_Ld5" grid="f09_g17" compset="I2000Clm45Fates" testmods="clm/FatesColdDef">
+    <machines>
+      <machine name="cheyenne" compiler="intel" category="aux_clm"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
@@ -1891,7 +1901,7 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
       <option name="wallclock">00:20:00</option>
     </options>
   </test>
-  <test name="ERS_Ld3" grid="f09_g17" compset="I2000Clm50Fates" testmods="clm/FatesColdDef">
+  <test name="ERS_D_Ld5" grid="f09_g17" compset="I2000Clm50Fates" testmods="clm/FatesColdDef">
     <machines>
       <machine name="cheyenne" compiler="intel" category="aux_clm"/>
     </machines>
@@ -2139,15 +2149,18 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
   <test name="ERP_Ld3" grid="f09_g17" compset="I2000Clm45Fates" testmods="clm/FatesColdDef">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
     </options>
   </test>
-  <test name="ERP_Ld9" grid="f45_f45_mg37" compset="I2000Clm45Fates" testmods="clm/FatesAllVars">
+  <test name="ERP_Ld9" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/FatesAllVars">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
       <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
@@ -2156,14 +2169,27 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
   <test name="ERS_D_Ld3" grid="f19_g17" compset="I2000Clm50FatesCru" testmods="clm/Fates">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
-      <option name="wallclock">00:20:00</option>
+      <option name="wallclock">00:40:00</option>
     </options>
   </test>
   <test name="ERS_D_Ld5" grid="f19_g17" compset="I2000Clm45Fates" testmods="clm/default">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="cheyenne" compiler="gnu" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
+    </machines>
+    <options>
+      <option name="wallclock">00:40:00</option>
+    </options>
+  </test>
+  <test name="ERS_D_Ld5" grid="f19_g16" compset="I2000Clm50BgcCruGs" testmods="clm/default">
+    <machines>
+      <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
@@ -2172,6 +2198,8 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
   <test name="ERS_D_Ld5" grid="f19_g17" compset="I2000Clm50FatesCru" testmods="clm/default">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
@@ -2189,21 +2217,42 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
   <test name="ERS_Ld5" grid="f19_g17" compset="I2000Clm45Fates" testmods="clm/FatesColdDef">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
     </options>
   </test>
-  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm45Fates" testmods="clm/Fates">
+  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/Fates">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
       <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
     </options>
   </test>
-  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm45Fates" testmods="clm/FatesNoFire">
+  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/FatesNoFire">
+    <machines>
+      <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
+    </machines>
+    <options>
+      <option name="wallclock">00:40:00</option>
+    </options>
+  </test>
+  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/FatesST3">
+    <machines>
+      <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
+    </machines>
+    <options>
+      <option name="wallclock">00:20:00</option>
+    </options>
+  </test>
+  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/FatesPPhys">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
     </machines>
@@ -2211,33 +2260,38 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
       <option name="wallclock">00:20:00</option>
     </options>
   </test>
-  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm45Fates" testmods="clm/FatesST3">
+    <test name="ERS_Ld30" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/FatesReducedComplexFixedBiogeo">
+    <machines>
+      <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>      
+    </machines>
+    <options>
+      <option name="wallclock">00:40:00</option>
+    </options>
+  </test>
+  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/FatesLogging">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
     </machines>
     <options>
-      <option name="wallclock">00:20:00</option>
+      <option name="wallclock">00:40:00</option>
     </options>
   </test>
-  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm45Fates" testmods="clm/FatesPPhys">
+  <test name="ERS_Ld30" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/FatesSizeAgeMort">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="hobart" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>      
     </machines>
     <options>
-      <option name="wallclock">00:20:00</option>
+      <option name="wallclock">00:40:00</option>
     </options>
   </test>
-  <test name="ERS_Ld60" grid="f45_f45_mg37" compset="I2000Clm45Fates" testmods="clm/FatesLogging">
+  <test name="SMS_Lm6" grid="f45_f45_mg37" compset="I2000Clm50FatesCruGs" testmods="clm/Fates">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
-    </machines>
-    <options>
-      <option name="wallclock">00:20:00</option>
-    </options>
-  </test>
-  <test name="SMS_Lm6" grid="f45_f45_mg37" compset="I2000Clm45Fates" testmods="clm/Fates">
-    <machines>
-      <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
@@ -2247,9 +2301,18 @@ for ERS test as otherwise it won't work for a sub-day test (no need to run this 
   <test name="SMS_Ly2" grid="1x1_brazil" compset="I2000Clm45FatesRs" testmods="clm/Fates">
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="cheyenne" compiler="gnu" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
+    </options>
+  </test>
+  <test name="ERS_D_Lm12" grid="1x1_brazil" compset="I2000Clm50FatesCruGs" testmods="clm/Fates_nat_and_anthro_ignitions">
+    <machines>
+      <machine name="cheyenne" compiler="intel" category="fates"/>
+    </machines>
+    <options>
+      <option name="wallclock">01:00:00</option>
     </options>
   </test>
   <test name="SMS_Lm1" grid="f10_f10_musgs" compset="I1850Clm50BgcCropCmip6waccm" testmods="clm/basic">
