@@ -628,12 +628,13 @@ module CLMFatesInterfaceMod
             ! initialize static layers for reduced complexity FATES versions from HLM 
             ! maybe make this into a subroutine of it's own later. 
             do m = natpft_lb,natpft_ub
+               ! Make sure that pft_areafrac zero-index regardless of natpft_lb setting
                ft = m-natpft_lb
-               this%fates(nc)%bc_in(s)%pft_areafrac(ft)=wt_nat_patch(g,ft)
+               this%fates(nc)%bc_in(s)%pft_areafrac(ft)=wt_nat_patch(g,m)
 
             end do
 
-            if(abs(sum(this%fates(nc)%bc_in(s)%pft_areafrac(natpft_lb:natpft_ub))-1.0_r8).gt.1.0e-9)then
+            if(abs(sum(this%fates(nc)%bc_in(s)%pft_areafrac(0:natpft_ub-natpft_lb))-1.0_r8).gt.1.0e-9)then
                write(iulog,*) 'pft_area error in interfc ',s, sum(this%fates(nc)%bc_in(s)%pft_areafrac(:))-1.0_r8
                call endrun(msg=errMsg(sourcefile, __LINE__))
               endif
@@ -852,7 +853,7 @@ module CLMFatesInterfaceMod
          ! in FATES. 
          ! N.B. Fow now these are fixed values pending HLM updates. 
          if(use_fates_sp)then
-           do ft = natpft_lb,natpft_ub !set of pfts in HLM
+           do ft = 0,natpft_ub-natpft_lb !set of pfts in HLM
                ! here we are mapping from P space in the HLM to FT space in the sp_input arrays.  
                p = ft + col%patchi(c) ! for an FT of 1 we want to use 
                this%fates(nc)%bc_in(s)%hlm_sp_tlai(ft) = canopystate_inst%tlai_patch(p)
