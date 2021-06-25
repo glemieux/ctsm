@@ -84,6 +84,9 @@ contains
     ! Note that dynpft_init needs to be called from outside any loops over clumps - so
     ! this routine needs to be called from outside any loops over clumps.
     !
+
+    use clm_varctl           , only : iulog
+
     ! !ARGUMENTS:
     type(bounds_type)       , intent(in)    :: bounds_proc ! processor-level bounds
     type(glc_behavior_type) , intent(in)    :: glc_behavior
@@ -106,11 +109,13 @@ contains
 
     ! Initialize stuff for prescribed transient Patches
     if (get_do_transient_pfts()) then
+       write(iulog,*) trim(subname), ': dynpft_interp'
        call dynpft_init(bounds_proc, dynpft_filename=get_flanduse_timeseries())
     end if
 
     ! Initialize stuff for prescribed transient crops
     if (get_do_transient_crops()) then
+       write(iulog,*) trim(subname), ': dyncrop_interp'
        call dyncrop_init(bounds_proc, dyncrop_filename=get_flanduse_timeseries())
     end if
 
@@ -119,12 +124,14 @@ contains
     ! harvest data were separated from the pftdyn data, allowing them to differ in the
     ! years over which they apply.
     if (get_do_harvest()) then
+       write(iulog,*) trim(subname), ': dynHarvest_interp'
        call dynHarvest_init(bounds_proc, harvest_filename=get_flanduse_timeseries())
     end if
 
     
     ! Initialize stuff for prescribed transient lakes
     if (get_do_transient_lakes()) then
+       write(iulog,*) trim(subname), ': dynlake_interp'
         call dynlake_init(bounds_proc, dynlake_filename=get_flanduse_timeseries())
     end if
     
@@ -134,14 +141,17 @@ contains
     ! ------------------------------------------------------------------------
 
     if (get_do_transient_pfts()) then
+       write(iulog,*) trim(subname), ': dynpft_interp'
        call dynpft_interp(bounds_proc)
     end if
 
     if (get_do_transient_crops()) then
+       write(iulog,*) trim(subname), ': dyncrop_interp'
        call dyncrop_interp(bounds_proc, crop_inst)
     end if
 
     if (get_do_transient_lakes()) then
+       write(iulog,*) trim(subname), ': dynlake_interp'
        call dynlake_interp(bounds_proc)
     end if
     
@@ -157,6 +167,7 @@ contains
     do nc = 1, nclumps
        call get_clump_bounds(nc, bounds_clump)
 
+       write(iulog,*) trim(subname), ': dynSubgrid_wrapup_weight_changes '
        call dynSubgrid_wrapup_weight_changes(bounds_clump, glc_behavior)
     end do
     !$OMP END PARALLEL DO
@@ -184,7 +195,7 @@ contains
     ! OUTSIDE any loops over clumps in the driver.
     !
     ! !USES:
-    use clm_varctl           , only : use_cn, use_fates
+    use clm_varctl           , only : use_cn, use_fates, iulog
     use dynInitColumnsMod    , only : initialize_new_columns
     use dynConsBiogeophysMod , only : dyn_hwcontent_init, dyn_hwcontent_final
     use dynEDMod             , only : dyn_ED
@@ -248,18 +259,22 @@ contains
     ! ==========================================================================
 
     if (get_do_transient_pfts()) then
+       write(iulog,*) trim(subname), ': dynpft_interp'
        call dynpft_interp(bounds_proc)
     end if
 
     if (get_do_transient_crops()) then
+       write(iulog,*) trim(subname), ': dyncrop_interp'
        call dyncrop_interp(bounds_proc,crop_inst)
     end if
 
     if (get_do_harvest() .and. .not. use_fates) then
+       write(iulog,*) trim(subname), ': dynHarvest_interp'
        call dynHarvest_interp(bounds_proc)
     end if
 	
     if (get_do_transient_lakes()) then
+       write(iulog,*) trim(subname), ': dynlake_interp'
        call dynlake_interp(bounds_proc)
     end if
     ! ==========================================================================

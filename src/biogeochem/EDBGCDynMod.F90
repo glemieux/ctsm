@@ -27,6 +27,7 @@ module EDBGCDynMod
   use atm2lndType                     , only : atm2lnd_type
   use SoilStateType                   , only : soilstate_type
   use ch4Mod                          , only : ch4_type
+  use clm_varctl                      , only : iulog
 
 
   ! public :: EDBGCDynInit         ! BGC dynamics: initialization
@@ -178,6 +179,7 @@ contains
     ! Soil Biogeochemistry
     !--------------------------------------------
 
+    write(iulog,*)  'EDBGCDyn: use_century_decomp: ', use_century_decomp
     if (use_century_decomp) then
        call decomp_rate_constants_bgc(bounds, num_soilc, filter_soilc, &
             soilstate_inst, temperature_inst, ch4_inst, soilbiogeochem_carbonflux_inst)

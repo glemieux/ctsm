@@ -1096,12 +1096,15 @@ module CLMFatesInterfaceMod
           ! protext it here with a lower bound of 0.0_r8.
 
           patch%wt_ed(col%patchi(c)) = max(0.0_r8, &
-
                1.0_r8-sum(this%fates(nc)%bc_out(s)%canopy_fraction_pa(1:npatch)))
+
+          if (isnan(patch%wt_ed(col%patchi(c)))) write(iulog,*) 'wrap_update_hlmfates_dyn: patch%wt_ed(col%patchi(c)) is nan'
+          if (isnan(patch%wt_ed(col%patchi(c)))) write(iulog,*) 'wrap_update_hlmfates_dyn: nc,s,c,npatch,col%patchi(c): ',nc,s,c,npatch,col%patchi(c)
 
           patch%sp_pftorder_index(col%patchi(c)) = 0 !bg is the 0th patch in the SP FATES structure
 
           areacheck = patch%wt_ed(col%patchi(c)) ! this is where we start the areachecking
+
 
           do ifp = 1, this%fates(nc)%sites(s)%youngest_patch%patchno
              ! for the vegetated patches
@@ -1114,6 +1117,10 @@ module CLMFatesInterfaceMod
  
              patch%is_veg(p) = .true.
              patch%wt_ed(p)  = this%fates(nc)%bc_out(s)%canopy_fraction_pa(ifp)
+
+             if (isnan(patch%wt_ed(p))) write(iulog,*) 'wrap_update_hlmfates_dyn: patch%wt_ed(p) is nan'
+             if (isnan(patch%wt_ed(p))) write(iulog,*) 'wrap_update_hlmfates_dyn: nc,s,c,p,ifp: ',nc,s,c,p,ifp
+
              areacheck = areacheck + patch%wt_ed(p)
 
              tlai(p) = this%fates(nc)%bc_out(s)%tlai_pa(ifp)
@@ -1176,6 +1183,8 @@ module CLMFatesInterfaceMod
      use FatesIOVariableKindMod, only : site_r8, site_int, cohort_r8, cohort_int
      use EDMainMod, only :        ed_update_site
      use FatesInterfaceTypesMod, only:  fates_maxElementsPerSite
+     use clm_instur       , only : wt_nat_patch
+     !use EDPhysiologyMod, only : satellite_phenology
 
       implicit none
 
@@ -1200,6 +1209,7 @@ module CLMFatesInterfaceMod
       integer                 :: s   ! Fates site index
       integer                 :: g   ! grid-cell index
       integer                 :: p   ! HLM patch index
+      integer                 :: m         ! HLM PFT index
       integer                 :: ft  ! plant functional type
       integer                 :: dk_index
       integer                 :: nlevsoil
@@ -1381,6 +1391,10 @@ module CLMFatesInterfaceMod
                ! ------------------------------------------------------------------------
                call this%fates_restart%create_patchcohort_structure(nc, &
                     this%fates(nc)%nsites, this%fates(nc)%sites, this%fates(nc)%bc_in)
+
+               !if (use_fates_sp) then
+               !    call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
+               !end if 
                
                call this%fates_restart%get_restart_vectors(nc, this%fates(nc)%nsites, &
                     this%fates(nc)%sites )
@@ -1388,10 +1402,10 @@ module CLMFatesInterfaceMod
                ! I think ed_update_site and update_hlmfates_dyn are doing some similar
                ! update type stuff, should consolidate (rgk 11-2016)
                do s = 1,this%fates(nc)%nsites
+
                   call ed_update_site( this%fates(nc)%sites(s), &
                         this%fates(nc)%bc_in(s), & 
                         this%fates(nc)%bc_out(s) )
-
 
                ! This call sends internal fates variables into the
                ! output boundary condition structures. Note: this is called

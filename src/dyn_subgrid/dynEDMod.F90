@@ -7,6 +7,7 @@ module dynEDMod
   use landunit_varcon, only : istsoil
   use PatchType      , only : patch
   use ColumnType     , only : col
+  use clm_varctl     , only : iulog
   !
   ! !PUBLIC MEMBER FUNCTIONS:
   implicit none
@@ -35,6 +36,10 @@ contains
           else
              patch%wtcol(p)  = 0.0_r8 
           end if
+       end if
+       if (isnan(patch%wtcol(p))) then
+           write(iulog,*) 'dyn_ED: isnan: p,c,patch%is_veg(p),patch%is_bareground(p),col%itype(c),istsoil,wt_ed:', &
+           p,c,patch%is_veg(p),patch%is_bareground(p),col%itype(c),istsoil,patch%wt_ed(p)
        end if
     end do
 

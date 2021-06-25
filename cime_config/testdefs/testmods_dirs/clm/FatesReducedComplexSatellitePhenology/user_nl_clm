@@ -1,1 +1,2 @@
 use_fates_sp = .true.
+hist_nhtfrq  = 1

@@ -609,7 +609,7 @@ contains
     do c = bounds%begc,bounds%endc
        if (.not. weights_okay(sumwtcol(c), active_only, col%active(c))) then
           write(iulog,*) trim(subname),' ERROR: at c = ',c,'total PFT weight is ',sumwtcol(c), &
-                         'active_only = ', active_only
+                         'active_only = ', active_only, 'p = ', p
           error_found = .true.
        end if
     end do
@@ -617,7 +617,7 @@ contains
     do l = bounds%begl,bounds%endl
        if (.not. weights_okay(sumwtlunit(l), active_only, lun%active(l))) then
           write(iulog,*) trim(subname),' ERROR: at l = ',l,'total PFT weight is ',sumwtlunit(l), &
-                         'active_only = ', active_only
+                         'active_only = ', active_only, 'p = ', p
           error_found = .true.
        end if
     end do
@@ -625,7 +625,7 @@ contains
     do g = bounds%begg,bounds%endg
        if (.not. weights_okay(sumwtgcell(g), active_only, i_am_active=.true.)) then
           write(iulog,*) trim(subname),' ERROR: at g = ',g,'total PFT weight is ',sumwtgcell(g), &
-                         'active_only = ', active_only
+                         'active_only = ', active_only, 'p = ', p
           error_found = .true.
        end if
     end do
