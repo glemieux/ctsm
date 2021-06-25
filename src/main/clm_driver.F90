@@ -384,6 +384,7 @@ contains
           call t_startf('prescribed_sm')
           call PrescribedSoilMoistureInterp(bounds_clump, soilstate_inst, &
                water_inst%waterstatebulk_inst)
+          write(iulog,*) 'clm_drv: PrescribedSoilMoistureInterp: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
           call t_stopf('prescribed_sm')
        endif
        call t_startf('begwbal')
@@ -443,7 +444,7 @@ contains
 
     ! When LAI streams are being used
     ! NOTE: This call needs to happen outside loops over nclumps (as streams are not threadsafe)
-    if ((.not. use_cn) .and. (.not. use_fates) .and. (doalb) .and. use_lai_streams) then 
+    if ((.not. use_cn) .and. (.not. use_fates) .and. (doalb) .and. use_lai_streams) then
        call lai_advance( bounds_proc )
     endif
 
@@ -910,6 +911,7 @@ contains
             scf_method, water_inst, &
             atm2lnd_inst, temperature_inst, soilstate_inst, &
             energyflux_inst, aerosol_inst, lakestate_inst, topo_inst)
+       write(iulog,*) 'clm_drv: LakeHydrology: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        !  Calculate column-integrated aerosol masses, and
        !  mass concentrations for radiative calculations and output
@@ -1036,6 +1038,7 @@ contains
             water_inst%waterdiagnosticbulk_inst, water_inst%waterbalancebulk_inst, &
             water_inst%waterfluxbulk_inst, water_inst%wateratm2lndbulk_inst, &
             glacier_smb_inst)
+            write(iulog,*) 'clm_drv: HydrologyDrainage: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        call t_stopf('hydro2_drainage')
 
@@ -1058,7 +1061,7 @@ contains
        end if
 
 
-       
+
        if ( use_fates) then
 
           call EDBGCDyn(bounds_clump,                                                              &
@@ -1088,7 +1091,7 @@ contains
                soilbiogeochem_carbonflux_inst, &
                soilbiogeochem_carbonstate_inst)
 
-          
+
           if( is_beg_curr_day() ) then
 
              ! --------------------------------------------------------------------------
@@ -1098,19 +1101,20 @@ contains
              if ( masterproc ) then
                 write(iulog,*)  'clm: calling FATES model ', get_nstep()
              end if
-             
+
              call clm_fates%dynamics_driv( nc, bounds_clump,                        &
                   atm2lnd_inst, soilstate_inst, temperature_inst, active_layer_inst, &
                   water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
                   water_inst%wateratm2lndbulk_inst, canopystate_inst, soilbiogeochem_carbonflux_inst, &
                   frictionvel_inst)
-             
+             write(iulog,*) 'clm_drv: clm_fates%dynamics_driv: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
+
              ! TODO(wjs, 2016-04-01) I think this setFilters call should be replaced by a
              ! call to reweight_wrapup, if it's needed at all.
              call setFilters( bounds_clump, glc_behavior )
 
           end if
-             
+
        end if ! use_fates branch
 
        ! ============================================================================
