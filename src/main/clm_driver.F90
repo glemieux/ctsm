@@ -476,6 +476,7 @@ contains
             canopystate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, &
             energyflux_inst)
+       write(iulog,*) 'clm_drv: clm_drv_init: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        call topo_inst%UpdateTopo(bounds_clump, &
             filter(nc)%num_icemecc, filter(nc)%icemecc, &
@@ -624,6 +625,7 @@ contains
             soilstate_inst, temperature_inst, &
             water_inst%wateratm2lndbulk_inst, water_inst%waterdiagnosticbulk_inst, &
             water_inst%waterstatebulk_inst)
+       write(iulog,*) 'clm_drv: BiogeophysPreFluxCalcs: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        call ozone_inst%CalcOzoneStress(bounds_clump, filter(nc)%num_exposedvegp, filter(nc)%exposedvegp)
 
@@ -640,6 +642,7 @@ contains
             atm2lnd_inst, temperature_inst, &
             water_inst%waterstatebulk_inst, water_inst%wateratm2lndbulk_inst, &
             soilstate_inst, water_inst%waterdiagnosticbulk_inst)
+       write(iulog,*) 'clm_drv: CalculateSurfaceHumidity: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgp1')
 
        ! ============================================================================
@@ -658,6 +661,7 @@ contains
             water_inst%waterfluxbulk_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, water_inst%wateratm2lndbulk_inst, &
             photosyns_inst, humanindex_inst)
+       write(iulog,*) 'clm_drv: BareGroundFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgflux')
 
        ! non-bareground fluxes for all patches except lakes and urban landunits
@@ -699,6 +703,7 @@ contains
             froot_carbon = froot_carbon(bounds_clump%begp:bounds_clump%endp), &
             croot_carbon = croot_carbon(bounds_clump%begp:bounds_clump%endp))
        deallocate(downreg_patch, leafn_patch, froot_carbon, croot_carbon)
+       write(iulog,*) 'clm_drv: CanopyFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('canflux')
 
        ! Fluxes for all urban landunits
@@ -713,6 +718,7 @@ contains
             water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
             frictionvel_inst, energyflux_inst, water_inst%waterfluxbulk_inst, &
             water_inst%wateratm2lndbulk_inst, humanindex_inst)
+       write(iulog,*) 'clm_drv: UrbanFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('uflux')
 
        ! Fluxes for all lake landunits
@@ -727,6 +733,7 @@ contains
             water_inst%waterfluxbulk_inst, water_inst%wateratm2lndbulk_inst, &
             lakestate_inst,&
             humanindex_inst)
+       write(iulog,*) 'clm_drv: LakeFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgplake')
 
        call frictionvel_inst%SetActualRoughnessLengths( &
@@ -765,6 +772,7 @@ contains
                (bounds_clump%begc:bounds_clump%endc , 1:nlevgrnd), &
                volr               = water_inst%wateratm2lndbulk_inst%volrmch_grc(bounds_clump%begg:bounds_clump%endg), &
                rof_prognostic     = rof_prognostic)
+          write(iulog,*) 'clm_drv: CalcIrrigationNeeded: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
           call t_stopf('irrigationneeded')
 
        end if
@@ -781,6 +789,7 @@ contains
             atm2lnd_inst, soilstate_inst, canopystate_inst, &
             water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
             frictionvel_inst, dust_inst)
+       write(iulog,*) 'clm_drv: DustEmission: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        ! Dust dry deposition (C. Zender's modified codes)
        call DustDryDep(bounds_clump, &
@@ -807,6 +816,7 @@ contains
             solarabs_inst, soilstate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, water_inst%waterfluxbulk_inst, ch4_inst, &
             energyflux_inst, temperature_inst, lakestate_inst)
+       write(iulog,*) 'clm_drv: LakeTemperature: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('lakeTemp')
 
        ! Set soil/snow temperatures including ground temperature
@@ -819,12 +829,14 @@ contains
             atm2lnd_inst, urbanparams_inst, canopystate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, water_inst%waterfluxbulk_inst, &
             solarabs_inst, soilstate_inst, energyflux_inst,  temperature_inst, urbantv_inst)
+       write(iulog,*) 'clm_drv: SoilTemperature: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        ! The following is called immediately after SoilTemperature so that melted ice is
        ! converted back to solid ice as soon as possible
        call glacier_smb_inst%HandleIceMelt(bounds_clump, &
             filter(nc)%num_do_smb_c, filter(nc)%do_smb_c, &
             water_inst%waterstatebulk_inst, water_inst%waterfluxbulk_inst)
+       write(iulog,*) 'clm_drv: HandleIceMelt: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('soiltemperature')
 
        ! ============================================================================
@@ -840,6 +852,7 @@ contains
             atm2lnd_inst, solarabs_inst, temperature_inst, canopystate_inst, &
             water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
             energyflux_inst, water_inst%waterfluxbulk_inst)
+       write(iulog,*) 'clm_drv: SoilFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgp2')
 
        ! ============================================================================
@@ -873,6 +886,7 @@ contains
             saturated_excess_runoff_inst, &
             infiltration_excess_runoff_inst, &
             aerosol_inst, canopystate_inst, scf_method, soil_water_retention_curve, topo_inst)
+       write(iulog,*) 'clm_drv: HydrologyNoDrainage: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        ! The following needs to be done after HydrologyNoDrainage (because it needs
        ! waterfluxbulk_inst%qflx_snwcp_ice_col), but before HydrologyDrainage (because
