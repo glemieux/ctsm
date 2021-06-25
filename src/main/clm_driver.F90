@@ -222,6 +222,7 @@ contains
     ! Specified phenology
     ! ============================================================================
 
+    write(iulog,*) 'clm_drv: pre-interpMonthlyVeg: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
     if (use_cn) then
        ! For dry-deposition need to call CLMSP so that mlaidiff is obtained
        if ( n_drydep > 0 .and. drydep_method == DD_XLND ) then
@@ -244,6 +245,7 @@ contains
        end if
 
     end if
+    write(iulog,*) 'clm_drv: post-interpMonthlyVeg: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
     ! ==================================================================================
     ! Determine decomp vertical profiles
@@ -331,6 +333,7 @@ contains
             filter(nc)%num_lakec, filter(nc)%lakec, &
             water_inst, lakestate_inst, &
             use_aquifer_layer = use_aquifer_layer(), flag = 'begwb')
+       write(iulog,*) 'clm_drv: WaterGridcellBalance: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('begwbal')
     end do
     !$OMP END PARALLEL DO
@@ -350,6 +353,7 @@ contains
          c13_soilbiogeochem_carbonstate_inst, c14_soilbiogeochem_carbonstate_inst,    &
          soilbiogeochem_nitrogenstate_inst, soilbiogeochem_carbonflux_inst, ch4_inst, &
          glc_behavior)
+    write(iulog,*) 'clm_drv: dynSubgrid_driver: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
     call t_stopf('dyn_subgrid')
 
     ! ============================================================================
