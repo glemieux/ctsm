@@ -748,6 +748,7 @@ contains
           ! on btran, so it could be moved earlier in the driver loop - possibly even
           ! immediately before ApplyIrrigation, which would be a more clear place to put it.
 
+          write(iulog,*) 'clm_drv: pre-CalcIrrigationNeeded: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
           call t_startf('irrigationneeded')
           call irrigation_inst%CalcIrrigationNeeded( &
                bounds             = bounds_clump, &
@@ -761,6 +762,7 @@ contains
                volr               = water_inst%wateratm2lndbulk_inst%volrmch_grc(bounds_clump%begg:bounds_clump%endg), &
                rof_prognostic     = rof_prognostic)
           call t_stopf('irrigationneeded')
+          write(iulog,*) 'clm_drv: post-CalcIrrigationNeeded: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        end if
 
