@@ -394,10 +394,12 @@ contains
          call water_inst%ResetCheckedTracers(bounds)
          call water_inst%TracerConsistencyCheck(bounds, 'HydrologyNoDrainage: before SnowCapping')
       end if
+      write(iulog,*) 'HydrologyNoDrainage: TracerConsistencyCheck: ', h2osoi_vol
 
       ! Snow capping
       call SnowCapping(bounds, num_nolakec, filter_nolakec, num_snowc, filter_snowc, &
            topo_inst, aerosol_inst, water_inst)
+      write(iulog,*) 'HydrologyNoDrainage: SnowCapping: ', h2osoi_vol
 
       ! Natural compaction and metamorphosis.
       call SnowCompaction(bounds, num_snowc, filter_snowc, &
@@ -408,14 +410,17 @@ contains
       ! Combine thin snow elements
       call CombineSnowLayers(bounds, num_snowc, filter_snowc, &
            aerosol_inst, temperature_inst, water_inst)
+      write(iulog,*) 'HydrologyNoDrainage: CombineSnowLayers: ', h2osoi_vol
 
       ! Divide thick snow elements
       call DivideSnowLayers(bounds, num_snowc, filter_snowc, &
            aerosol_inst, temperature_inst, water_inst, is_lake=.false.)
+      write(iulog,*) 'HydrologyNoDrainage: DivideSnowLayers: ', h2osoi_vol
 
       ! Set empty snow layers to zero
       call ZeroEmptySnowLayers(bounds, num_snowc, filter_snowc, &
            col, water_inst, temperature_inst)
+      write(iulog,*) 'HydrologyNoDrainage: ZeroEmptySnowLayers: ', h2osoi_vol
 
       ! Build new snow filter
 
