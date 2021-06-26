@@ -576,16 +576,15 @@ contains
       do j = 1, nlevgrnd
          do fc = 1, num_nolakec
             c = filter_nolakec(fc)
-            write(iulog,*) 'HydrologyNoDrainage: num_nolakec, fc, c: ', num_nolakec, fc, c
-            write(iulog,*) 'HydrologyNoDrainage: filter_nolakec(fc): ', filter_nolakec(fc)
-            write(iulog,*) 'HydrologyNoDrainage: ctype(c): ', ctype(c)
             if (ctype(c) /= icol_sunwall .and. ctype(c) /= icol_shadewall &
                  .and. ctype(c) /= icol_roof) then
                h2osoi_vol(c,j) = h2osoi_liq(c,j)/(dz(c,j)*denh2o) + h2osoi_ice(c,j)/(dz(c,j)*denice)
+               write(iulog,*) 'HydrologyNoDrainage: h2osoi_vol: ', h2osoi_vol(c,j)
+               write(iulog,*) 'HydrologyNoDrainage: h2osoi_liq,h2osoi_ice: ', h2osoi_liq(c,j), h2osoi_ice(c,j)
+               write(iulog,*) 'HydrologyNoDrainage: dz(c,j),denh2o,denice: ',dz(c,j),denh2o,denice
             end if
          end do
       end do
-      write(iulog,*) 'HydrologyNoDrainage: num_nolakec', h2osoi_vol
 
       do j = 1, nlevurb
          do fc = 1, num_urbanc
