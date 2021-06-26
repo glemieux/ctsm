@@ -299,11 +299,11 @@ contains
          call CLMVICMap(bounds, num_hydrologyc, filter_hydrologyc, &
               soilhydrology_inst, b_waterstate_inst)
       end if
-      write(iulog,*) 'HydrologyNoDrainage: CLMVICMap1: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: CLMVICMap1: ', h2osoi_liq
 
       call SetSoilWaterFractions(bounds, num_hydrologyc, filter_hydrologyc, &
            soilhydrology_inst, soilstate_inst, b_waterstate_inst)
-      write(iulog,*) 'HydrologyNoDrainage: SetSoilWaterFractions: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: SetSoilWaterFractions: ', h2osoi_liq
 
       call SetFloodc(num_nolakec, filter_nolakec, col, &
            b_wateratm2lnd_inst, b_waterflux_inst)
@@ -327,7 +327,7 @@ contains
            infiltration_excess_runoff_inst, &
            energyflux_inst, soilhydrology_inst, &
            b_waterflux_inst, b_waterstate_inst, b_waterdiagnostic_inst)
-      write(iulog,*) 'HydrologyNoDrainage: UpdateH2osfc: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: UpdateH2osfc: ', h2osoi_liq
 
       call Infiltration(bounds, num_hydrologyc, filter_hydrologyc, &
            b_waterflux_inst)
@@ -336,11 +336,11 @@ contains
            num_urbanc, filter_urbanc, &
            b_waterflux_inst, soilhydrology_inst, &
            b_waterstate_inst)
-      write(iulog,*) 'HydrologyNoDrainage: TotalSurfaceRunoff: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: TotalSurfaceRunoff: ', h2osoi_liq
 
       call UpdateUrbanPonding(bounds, num_urbanc, filter_urbanc, &
            b_waterstate_inst, soilhydrology_inst, b_waterflux_inst)
-      write(iulog,*) 'HydrologyNoDrainage: UpdateUrbanPonding: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: UpdateUrbanPonding: ', h2osoi_liq
 
       call Compute_EffecRootFrac_And_VertTranSink(bounds, num_hydrologyc, &
            filter_hydrologyc, soilstate_inst, canopystate_inst, b_waterflux_inst, energyflux_inst)
@@ -352,31 +352,31 @@ contains
       call SoilWater(bounds, num_hydrologyc, filter_hydrologyc, num_urbanc, filter_urbanc, &
            soilhydrology_inst, soilstate_inst, b_waterflux_inst, b_waterstate_inst, temperature_inst, &
            canopystate_inst, energyflux_inst, soil_water_retention_curve)
-      write(iulog,*) 'HydrologyNoDrainage: SoilWater: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: SoilWater: ', h2osoi_liq
 
       if (use_vichydro) then
          ! mapping soilmoist from CLM to VIC layers for runoff calculations
          call CLMVICMap(bounds, num_hydrologyc, filter_hydrologyc, &
               soilhydrology_inst, b_waterstate_inst)
-         write(iulog,*) 'HydrologyNoDrainage: CLMVICMap2: ', h2osoi_vol
+         write(iulog,*) 'HydrologyNoDrainage: CLMVICMap2: ', h2osoi_liq
       end if
 
       if (use_aquifer_layer()) then
          call WaterTable(bounds, num_hydrologyc, filter_hydrologyc, &
               soilhydrology_inst, soilstate_inst, temperature_inst, b_waterstate_inst, &
               b_waterflux_inst)
-         write(iulog,*) 'HydrologyNoDrainage: WaterTable: ', h2osoi_vol
+         write(iulog,*) 'HydrologyNoDrainage: WaterTable: ', h2osoi_liq
       else
 
          call PerchedWaterTable(bounds, num_hydrologyc, filter_hydrologyc, &
               num_urbanc, filter_urbanc, soilhydrology_inst, soilstate_inst, &
               temperature_inst, b_waterstate_inst, b_waterflux_inst)
-         write(iulog,*) 'HydrologyNoDrainage: PerchedWaterTable: ', h2osoi_vol
+         write(iulog,*) 'HydrologyNoDrainage: PerchedWaterTable: ', h2osoi_liq
 
          call ThetaBasedWaterTable(bounds, num_hydrologyc, filter_hydrologyc, &
               num_urbanc, filter_urbanc, soilhydrology_inst, soilstate_inst, &
               b_waterstate_inst, b_waterflux_inst)
-         write(iulog,*) 'HydrologyNoDrainage: ThetaBasedWaterTable: ', h2osoi_vol
+         write(iulog,*) 'HydrologyNoDrainage: ThetaBasedWaterTable: ', h2osoi_liq
 
       end if
 
@@ -384,7 +384,7 @@ contains
            num_urbanc, filter_urbanc,&
            soilhydrology_inst, soilstate_inst, &
            b_waterstate_inst, b_waterdiagnostic_inst, b_waterflux_inst)
-      write(iulog,*) 'HydrologyNoDrainage: RenewCondensation: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: RenewCondensation: ', h2osoi_liq
 
       ! BUG(wjs, 2019-09-16, ESCOMP/ctsm#762) This is needed so that we can test the
       ! tracerization of the following snow stuff without having tracerized everything
@@ -394,33 +394,33 @@ contains
          call water_inst%ResetCheckedTracers(bounds)
          call water_inst%TracerConsistencyCheck(bounds, 'HydrologyNoDrainage: before SnowCapping')
       end if
-      write(iulog,*) 'HydrologyNoDrainage: TracerConsistencyCheck: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: TracerConsistencyCheck: ', h2osoi_liq
 
       ! Snow capping
       call SnowCapping(bounds, num_nolakec, filter_nolakec, num_snowc, filter_snowc, &
            topo_inst, aerosol_inst, water_inst)
-      write(iulog,*) 'HydrologyNoDrainage: SnowCapping: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: SnowCapping: ', h2osoi_liq
 
       ! Natural compaction and metamorphosis.
       call SnowCompaction(bounds, num_snowc, filter_snowc, &
            scf_method, &
            temperature_inst, b_waterstate_inst, b_waterdiagnostic_inst, atm2lnd_inst)
-      write(iulog,*) 'HydrologyNoDrainage: SnowCompaction: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: SnowCompaction: ', h2osoi_liq
 
       ! Combine thin snow elements
       call CombineSnowLayers(bounds, num_snowc, filter_snowc, &
            aerosol_inst, temperature_inst, water_inst)
-      write(iulog,*) 'HydrologyNoDrainage: CombineSnowLayers: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: CombineSnowLayers: ', h2osoi_liq
 
       ! Divide thick snow elements
       call DivideSnowLayers(bounds, num_snowc, filter_snowc, &
            aerosol_inst, temperature_inst, water_inst, is_lake=.false.)
-      write(iulog,*) 'HydrologyNoDrainage: DivideSnowLayers: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: DivideSnowLayers: ', h2osoi_liq
 
       ! Set empty snow layers to zero
       call ZeroEmptySnowLayers(bounds, num_snowc, filter_snowc, &
            col, water_inst, temperature_inst)
-      write(iulog,*) 'HydrologyNoDrainage: ZeroEmptySnowLayers: ', h2osoi_vol
+      write(iulog,*) 'HydrologyNoDrainage: ZeroEmptySnowLayers: ', h2osoi_liq
 
       ! Build new snow filter
 
