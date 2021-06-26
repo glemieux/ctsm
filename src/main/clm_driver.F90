@@ -222,7 +222,6 @@ contains
     ! Specified phenology
     ! ============================================================================
 
-    write(iulog,*) 'clm_drv: pre-interpMonthlyVeg: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
     if (use_cn) then
        ! For dry-deposition need to call CLMSP so that mlaidiff is obtained
        if ( n_drydep > 0 .and. drydep_method == DD_XLND ) then
@@ -245,7 +244,6 @@ contains
        end if
 
     end if
-    write(iulog,*) 'clm_drv: post-interpMonthlyVeg: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
     ! ==================================================================================
     ! Determine decomp vertical profiles
@@ -333,7 +331,6 @@ contains
             filter(nc)%num_lakec, filter(nc)%lakec, &
             water_inst, lakestate_inst, &
             use_aquifer_layer = use_aquifer_layer(), flag = 'begwb')
-       write(iulog,*) 'clm_drv: WaterGridcellBalance: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('begwbal')
     end do
     !$OMP END PARALLEL DO
@@ -353,7 +350,6 @@ contains
          c13_soilbiogeochem_carbonstate_inst, c14_soilbiogeochem_carbonstate_inst,    &
          soilbiogeochem_nitrogenstate_inst, soilbiogeochem_carbonflux_inst, ch4_inst, &
          glc_behavior)
-    write(iulog,*) 'clm_drv: dynSubgrid_driver: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
     call t_stopf('dyn_subgrid')
 
     ! ============================================================================
@@ -388,7 +384,6 @@ contains
           call t_startf('prescribed_sm')
           call PrescribedSoilMoistureInterp(bounds_clump, soilstate_inst, &
                water_inst%waterstatebulk_inst)
-          write(iulog,*) 'clm_drv: PrescribedSoilMoistureInterp: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
           call t_stopf('prescribed_sm')
        endif
        call t_startf('begwbal')
@@ -476,7 +471,6 @@ contains
             canopystate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, &
             energyflux_inst)
-       write(iulog,*) 'clm_drv: clm_drv_init: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        call topo_inst%UpdateTopo(bounds_clump, &
             filter(nc)%num_icemecc, filter(nc)%icemecc, &
@@ -625,7 +619,6 @@ contains
             soilstate_inst, temperature_inst, &
             water_inst%wateratm2lndbulk_inst, water_inst%waterdiagnosticbulk_inst, &
             water_inst%waterstatebulk_inst)
-       write(iulog,*) 'clm_drv: BiogeophysPreFluxCalcs: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        call ozone_inst%CalcOzoneStress(bounds_clump, filter(nc)%num_exposedvegp, filter(nc)%exposedvegp)
 
@@ -642,7 +635,6 @@ contains
             atm2lnd_inst, temperature_inst, &
             water_inst%waterstatebulk_inst, water_inst%wateratm2lndbulk_inst, &
             soilstate_inst, water_inst%waterdiagnosticbulk_inst)
-       write(iulog,*) 'clm_drv: CalculateSurfaceHumidity: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgp1')
 
        ! ============================================================================
@@ -661,7 +653,6 @@ contains
             water_inst%waterfluxbulk_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, water_inst%wateratm2lndbulk_inst, &
             photosyns_inst, humanindex_inst)
-       write(iulog,*) 'clm_drv: BareGroundFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgflux')
 
        ! non-bareground fluxes for all patches except lakes and urban landunits
@@ -703,7 +694,6 @@ contains
             froot_carbon = froot_carbon(bounds_clump%begp:bounds_clump%endp), &
             croot_carbon = croot_carbon(bounds_clump%begp:bounds_clump%endp))
        deallocate(downreg_patch, leafn_patch, froot_carbon, croot_carbon)
-       write(iulog,*) 'clm_drv: CanopyFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('canflux')
 
        ! Fluxes for all urban landunits
@@ -718,7 +708,6 @@ contains
             water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
             frictionvel_inst, energyflux_inst, water_inst%waterfluxbulk_inst, &
             water_inst%wateratm2lndbulk_inst, humanindex_inst)
-       write(iulog,*) 'clm_drv: UrbanFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('uflux')
 
        ! Fluxes for all lake landunits
@@ -733,7 +722,6 @@ contains
             water_inst%waterfluxbulk_inst, water_inst%wateratm2lndbulk_inst, &
             lakestate_inst,&
             humanindex_inst)
-       write(iulog,*) 'clm_drv: LakeFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgplake')
 
        call frictionvel_inst%SetActualRoughnessLengths( &
@@ -772,7 +760,6 @@ contains
                (bounds_clump%begc:bounds_clump%endc , 1:nlevgrnd), &
                volr               = water_inst%wateratm2lndbulk_inst%volrmch_grc(bounds_clump%begg:bounds_clump%endg), &
                rof_prognostic     = rof_prognostic)
-          write(iulog,*) 'clm_drv: CalcIrrigationNeeded: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
           call t_stopf('irrigationneeded')
 
        end if
@@ -789,7 +776,6 @@ contains
             atm2lnd_inst, soilstate_inst, canopystate_inst, &
             water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
             frictionvel_inst, dust_inst)
-       write(iulog,*) 'clm_drv: DustEmission: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        ! Dust dry deposition (C. Zender's modified codes)
        call DustDryDep(bounds_clump, &
@@ -816,7 +802,6 @@ contains
             solarabs_inst, soilstate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, water_inst%waterfluxbulk_inst, ch4_inst, &
             energyflux_inst, temperature_inst, lakestate_inst)
-       write(iulog,*) 'clm_drv: LakeTemperature: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('lakeTemp')
 
        ! Set soil/snow temperatures including ground temperature
@@ -829,14 +814,12 @@ contains
             atm2lnd_inst, urbanparams_inst, canopystate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, water_inst%waterfluxbulk_inst, &
             solarabs_inst, soilstate_inst, energyflux_inst,  temperature_inst, urbantv_inst)
-       write(iulog,*) 'clm_drv: SoilTemperature: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        ! The following is called immediately after SoilTemperature so that melted ice is
        ! converted back to solid ice as soon as possible
        call glacier_smb_inst%HandleIceMelt(bounds_clump, &
             filter(nc)%num_do_smb_c, filter(nc)%do_smb_c, &
             water_inst%waterstatebulk_inst, water_inst%waterfluxbulk_inst)
-       write(iulog,*) 'clm_drv: HandleIceMelt: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('soiltemperature')
 
        ! ============================================================================
@@ -852,7 +835,6 @@ contains
             atm2lnd_inst, solarabs_inst, temperature_inst, canopystate_inst, &
             water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
             energyflux_inst, water_inst%waterfluxbulk_inst)
-       write(iulog,*) 'clm_drv: SoilFluxes: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('bgp2')
 
        ! ============================================================================

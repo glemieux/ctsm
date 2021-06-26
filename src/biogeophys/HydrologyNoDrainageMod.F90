@@ -265,16 +265,12 @@ contains
     ! before this point.  Remove this block once code before this point is fully
     ! tracerized.
 
-    write(iulog,*) 'HydrologyNoDrainage: pre-everything', water_inst%waterstatebulk_inst%h2osoi_vol_col
-
-    if (water_inst%DoConsistencyCheck()) then
+        if (water_inst%DoConsistencyCheck()) then
        call water_inst%ResetCheckedTracers(bounds)
        call water_inst%TracerConsistencyCheck(bounds, 'before main snow code in HydrologyNoDrainage')
     end if
 
-    write(iulog,*) 'HydrologyNoDrainage: pre-TracerConsistencyCheck', water_inst%waterstatebulk_inst%h2osoi_vol_col
-
-      ! Determine step size
+    ! Determine step size
 
       dtime = get_step_size_real()
 
@@ -316,13 +312,11 @@ contains
 
       call SetQflxInputs(bounds, num_hydrologyc, filter_hydrologyc, &
            b_waterflux_inst, b_waterdiagnostic_inst)
-      write(iulog,*) 'HydrologyNoDrainage: SetQflxInputs', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
       call infiltration_excess_runoff_inst%InfiltrationExcessRunoff( &
            bounds, num_hydrologyc, filter_hydrologyc, &
            soilhydrology_inst, soilstate_inst, saturated_excess_runoff_inst, b_waterflux_inst, &
            b_waterdiagnostic_inst)
-           write(iulog,*) 'HydrologyNoDrainage: InfiltrationExcessRunoff', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
       call RouteInfiltrationExcess(bounds, num_hydrologyc, filter_hydrologyc, &
            b_waterflux_inst, soilhydrology_inst)
@@ -331,7 +325,6 @@ contains
            infiltration_excess_runoff_inst, &
            energyflux_inst, soilhydrology_inst, &
            b_waterflux_inst, b_waterstate_inst, b_waterdiagnostic_inst)
-      write(iulog,*) 'HydrologyNoDrainage: UpdateH2osfc', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
       call Infiltration(bounds, num_hydrologyc, filter_hydrologyc, &
            b_waterflux_inst)
@@ -381,7 +374,6 @@ contains
            num_urbanc, filter_urbanc,&
            soilhydrology_inst, soilstate_inst, &
            b_waterstate_inst, b_waterdiagnostic_inst, b_waterflux_inst)
-      write(iulog,*) 'HydrologyNoDrainage: RenewCondensation', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
       ! BUG(wjs, 2019-09-16, ESCOMP/ctsm#762) This is needed so that we can test the
       ! tracerization of the following snow stuff without having tracerized everything
@@ -400,7 +392,6 @@ contains
       call SnowCompaction(bounds, num_snowc, filter_snowc, &
            scf_method, &
            temperature_inst, b_waterstate_inst, b_waterdiagnostic_inst, atm2lnd_inst)
-      write(iulog,*) 'HydrologyNoDrainage: SnowCompaction', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
       ! Combine thin snow elements
       call CombineSnowLayers(bounds, num_snowc, filter_snowc, &
@@ -585,6 +576,9 @@ contains
       do j = 1, nlevgrnd
          do fc = 1, num_nolakec
             c = filter_nolakec(fc)
+            write(iulog,*) 'HydrologyNoDrainage: num_nolakec, fc, c: ', num_nolakec, fc, c
+            write(iulog,*) 'HydrologyNoDrainage: filter_nolakec(fc): ', filter_nolakec(fc)
+            write(iulog,*) 'HydrologyNoDrainage: ctype(c): ', ctype(c)
             if (ctype(c) /= icol_sunwall .and. ctype(c) /= icol_shadewall &
                  .and. ctype(c) /= icol_roof) then
                h2osoi_vol(c,j) = h2osoi_liq(c,j)/(dz(c,j)*denh2o) + h2osoi_ice(c,j)/(dz(c,j)*denice)
