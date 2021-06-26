@@ -24,6 +24,7 @@ module SurfaceWaterMod
   use WaterStateBulkType          , only : waterstatebulk_type
   use WaterDiagnosticBulkType     , only : waterdiagnosticbulk_type
   use WaterTracerUtils            , only : CalcTracerFromBulk
+  use clm_varctl                  , only : iulog
 
   implicit none
   save
@@ -155,7 +156,7 @@ contains
        qflx_too_small_h2osfc_to_soil)
     !
     ! !DESCRIPTION:
-    ! Determine fraction of land surfaces which are submerged  
+    ! Determine fraction of land surfaces which are submerged
     ! based on surface microtopography and surface water storage.
     !
     ! The main purpose of this routine is to update frac_h2osfc. However, it also has
@@ -169,7 +170,7 @@ contains
     ! Note that this just operates over soil points: special landunits have frac_h2osfc fixed at 0
     !
     ! !ARGUMENTS:
-    type(bounds_type)     , intent(in)           :: bounds           
+    type(bounds_type)     , intent(in)           :: bounds
     integer               , intent(in)           :: num_soilc       ! number of points in soilc filter
     integer               , intent(in)           :: filter_soilc(:) ! column filter for soil points
 
@@ -206,9 +207,9 @@ contains
        c = filter_soilc(f)
 
        !  Use newton-raphson method to iteratively determine frac_h2osfc
-       !  based on amount of surface water storage (h2osfc) and 
+       !  based on amount of surface water storage (h2osfc) and
        !  microtopography variability (micro_sigma)
-       
+
        if (h2osfc(c) > min_h2osfc) then
           ! a cutoff is needed for numerical reasons...(nonconvergence after 5 iterations)
           d=0.0
@@ -246,7 +247,7 @@ contains
        ! ever added in one place, it needs to be added in the other place, too).
        if (frac_sno(c) > (1._r8 - frac_h2osfc(c)) .and. h2osno_total(c) > 0) then
 
-          if (frac_h2osfc(c) > 0.01_r8) then             
+          if (frac_h2osfc(c) > 0.01_r8) then
              frac_h2osfc(c) = max(1.0_r8 - frac_sno(c),0.01_r8)
              frac_sno(c) = 1.0_r8 - frac_h2osfc(c)
           else
@@ -300,6 +301,7 @@ contains
        h2osfc_orig(c) = h2osfc(c)
        h2osfc(c) = h2osfc(c) - qflx_too_small_h2osfc_to_soil(c) * dtime
        h2osoi_liq(c,1) = h2osoi_liq(c,1) + qflx_too_small_h2osfc_to_soil(c) * dtime
+       write(iulog,*) 'UpdateState_TooSmallH2osfcToSoil: h2osoi_liq',h2osoi_liq(c,1)
     end do
 
     call truncate_small_values( &
@@ -322,7 +324,7 @@ contains
     ! Calculate fluxes out of h2osfc and update the h2osfc state
     !
     ! !ARGUMENTS:
-    type(bounds_type)        , intent(in)    :: bounds               
+    type(bounds_type)        , intent(in)    :: bounds
     integer                  , intent(in)    :: num_hydrologyc       ! number of column soil points in column filter
     integer                  , intent(in)    :: filter_hydrologyc(:) ! column filter for soil points
     type(infiltration_excess_runoff_type), intent(in) :: infiltration_excess_runoff_inst
@@ -338,18 +340,18 @@ contains
     real(r8) :: h2osfc_partial(bounds%begc:bounds%endc)    ! partially-updated h2osfc
     !-----------------------------------------------------------------------
 
-    associate(                                                        & 
+    associate(                                                        &
          qinmax           =>    infiltration_excess_runoff_inst%qinmax_col , & ! Input:  [real(r8) (:)] maximum infiltration rate (mm H2O /s)
-         
+
          frac_h2osfc      =>    waterdiagnosticbulk_inst%frac_h2osfc_col     , & ! Input:  [real(r8) (:)   ]  fraction of ground covered by surface water (0 to 1)
          frac_h2osfc_nosnow  => waterdiagnosticbulk_inst%frac_h2osfc_nosnow_col,    & ! Input: [real(r8) (:)   ] col fractional area with surface water greater than zero (if no snow present)
-         h2osfc           =>    waterstatebulk_inst%h2osfc_col          , & ! Output: [real(r8) (:)   ]  surface water (mm)                                
-         
+         h2osfc           =>    waterstatebulk_inst%h2osfc_col          , & ! Output: [real(r8) (:)   ]  surface water (mm)
+
          qflx_in_h2osfc   => waterfluxbulk_inst%qflx_in_h2osfc_col      , & ! Input:  [real(r8) (:)   ] total surface input to h2osfc
-         qflx_h2osfc_surf =>    waterfluxbulk_inst%qflx_h2osfc_surf_col , & ! Output: [real(r8) (:)   ]  surface water runoff (mm H2O /s)                       
+         qflx_h2osfc_surf =>    waterfluxbulk_inst%qflx_h2osfc_surf_col , & ! Output: [real(r8) (:)   ]  surface water runoff (mm H2O /s)
          qflx_h2osfc_drain => waterfluxbulk_inst%qflx_h2osfc_drain_col  , & ! Output: [real(r8) (:)   ]  bottom drainage from h2osfc (mm H2O /s)
-         
-         h2osfc_thresh    =>    soilhydrology_inst%h2osfc_thresh_col, & ! Input:  [real(r8) (:)   ]  level at which h2osfc "percolates"                
+
+         h2osfc_thresh    =>    soilhydrology_inst%h2osfc_thresh_col, & ! Input:  [real(r8) (:)   ]  level at which h2osfc "percolates"
          h2osfcflag       =>    soilhydrology_inst%h2osfcflag         & ! Input:  integer
          )
 

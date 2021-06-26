@@ -299,9 +299,11 @@ contains
          call CLMVICMap(bounds, num_hydrologyc, filter_hydrologyc, &
               soilhydrology_inst, b_waterstate_inst)
       end if
+      write(iulog,*) 'HydrologyNoDrainage: CLMVICMap1: ', h2osoi_vol
 
       call SetSoilWaterFractions(bounds, num_hydrologyc, filter_hydrologyc, &
            soilhydrology_inst, soilstate_inst, b_waterstate_inst)
+      write(iulog,*) 'HydrologyNoDrainage: SetSoilWaterFractions: ', h2osoi_vol
 
       call SetFloodc(num_nolakec, filter_nolakec, col, &
            b_wateratm2lnd_inst, b_waterflux_inst)
@@ -325,6 +327,7 @@ contains
            infiltration_excess_runoff_inst, &
            energyflux_inst, soilhydrology_inst, &
            b_waterflux_inst, b_waterstate_inst, b_waterdiagnostic_inst)
+      write(iulog,*) 'HydrologyNoDrainage: UpdateH2osfc: ', h2osoi_vol
 
       call Infiltration(bounds, num_hydrologyc, filter_hydrologyc, &
            b_waterflux_inst)
@@ -333,9 +336,11 @@ contains
            num_urbanc, filter_urbanc, &
            b_waterflux_inst, soilhydrology_inst, &
            b_waterstate_inst)
+      write(iulog,*) 'HydrologyNoDrainage: TotalSurfaceRunoff: ', h2osoi_vol
 
       call UpdateUrbanPonding(bounds, num_urbanc, filter_urbanc, &
            b_waterstate_inst, soilhydrology_inst, b_waterflux_inst)
+      write(iulog,*) 'HydrologyNoDrainage: UpdateUrbanPonding: ', h2osoi_vol
 
       call Compute_EffecRootFrac_And_VertTranSink(bounds, num_hydrologyc, &
            filter_hydrologyc, soilstate_inst, canopystate_inst, b_waterflux_inst, energyflux_inst)
@@ -347,26 +352,31 @@ contains
       call SoilWater(bounds, num_hydrologyc, filter_hydrologyc, num_urbanc, filter_urbanc, &
            soilhydrology_inst, soilstate_inst, b_waterflux_inst, b_waterstate_inst, temperature_inst, &
            canopystate_inst, energyflux_inst, soil_water_retention_curve)
+      write(iulog,*) 'HydrologyNoDrainage: SoilWater: ', h2osoi_vol
 
       if (use_vichydro) then
          ! mapping soilmoist from CLM to VIC layers for runoff calculations
          call CLMVICMap(bounds, num_hydrologyc, filter_hydrologyc, &
               soilhydrology_inst, b_waterstate_inst)
+         write(iulog,*) 'HydrologyNoDrainage: CLMVICMap2: ', h2osoi_vol
       end if
 
       if (use_aquifer_layer()) then
          call WaterTable(bounds, num_hydrologyc, filter_hydrologyc, &
               soilhydrology_inst, soilstate_inst, temperature_inst, b_waterstate_inst, &
               b_waterflux_inst)
+         write(iulog,*) 'HydrologyNoDrainage: WaterTable: ', h2osoi_vol
       else
 
          call PerchedWaterTable(bounds, num_hydrologyc, filter_hydrologyc, &
               num_urbanc, filter_urbanc, soilhydrology_inst, soilstate_inst, &
               temperature_inst, b_waterstate_inst, b_waterflux_inst)
+         write(iulog,*) 'HydrologyNoDrainage: PerchedWaterTable: ', h2osoi_vol
 
          call ThetaBasedWaterTable(bounds, num_hydrologyc, filter_hydrologyc, &
               num_urbanc, filter_urbanc, soilhydrology_inst, soilstate_inst, &
               b_waterstate_inst, b_waterflux_inst)
+         write(iulog,*) 'HydrologyNoDrainage: ThetaBasedWaterTable: ', h2osoi_vol
 
       end if
 
@@ -374,6 +384,7 @@ contains
            num_urbanc, filter_urbanc,&
            soilhydrology_inst, soilstate_inst, &
            b_waterstate_inst, b_waterdiagnostic_inst, b_waterflux_inst)
+      write(iulog,*) 'HydrologyNoDrainage: RenewCondensation: ', h2osoi_vol
 
       ! BUG(wjs, 2019-09-16, ESCOMP/ctsm#762) This is needed so that we can test the
       ! tracerization of the following snow stuff without having tracerized everything
@@ -392,6 +403,7 @@ contains
       call SnowCompaction(bounds, num_snowc, filter_snowc, &
            scf_method, &
            temperature_inst, b_waterstate_inst, b_waterdiagnostic_inst, atm2lnd_inst)
+      write(iulog,*) 'HydrologyNoDrainage: SnowCompaction: ', h2osoi_vol
 
       ! Combine thin snow elements
       call CombineSnowLayers(bounds, num_snowc, filter_snowc, &
