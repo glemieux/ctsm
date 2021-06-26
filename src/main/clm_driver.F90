@@ -863,6 +863,7 @@ contains
        call clm_drv_patch2col(bounds_clump, &
             filter(nc)%num_allc, filter(nc)%allc, filter(nc)%num_nolakec, filter(nc)%nolakec, &
             energyflux_inst, water_inst%waterfluxbulk_inst)
+       write(iulog,*) 'clm_drv: clm_drv_patch2col: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
        call t_stopf('patch2col')
 
        ! ============================================================================
