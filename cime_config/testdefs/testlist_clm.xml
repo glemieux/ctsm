@@ -1420,7 +1420,7 @@
     </machines>
     <options>
       <option name="wallclock">00:20:00</option>
-      <option name="comment"  >Run ARCTIC for transient case starting in 1979 as for AMIP CAM cases, 
+      <option name="comment"  >Run ARCTIC for transient case starting in 1979 as for AMIP CAM cases,
                 (no need to run this high core count test with every tag, but include it in the less frequent ctsm_sci testing)"</option>
     </options>
   </test>
@@ -2335,7 +2335,18 @@
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
       <machine name="izumi" compiler="nag" category="fates"/>
-      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>      
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
+    </machines>
+    <options>
+      <option name="wallclock">00:40:00</option>
+      <option name="comment">30 day exact restart test for FATES fixed biogeography reduced complexity mode on an f45 grid.</option>
+    </options>
+  </test>
+  <test name="ERS_D_Ld5" grid="f45_f45_mg37" compset="I2000Clm50FatesCru" testmods="clm/FatesReducedComplexFixedBiogeo">
+    <machines>
+      <machine name="cheyenne" compiler="intel" category="fates"/>
+      <machine name="izumi" compiler="nag" category="fates"/>
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
@@ -2346,7 +2357,7 @@
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
       <machine name="izumi" compiler="nag" category="fates"/>
-      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>      
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
@@ -2408,7 +2419,7 @@
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
       <machine name="izumi" compiler="nag" category="fates"/>
-      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>      
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
@@ -2418,7 +2429,7 @@
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
       <machine name="izumi" compiler="nag" category="fates"/>
-      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>      
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
@@ -2438,7 +2449,7 @@
     <machines>
       <machine name="cheyenne" compiler="intel" category="fates"/>
       <machine name="hobart" compiler="nag" category="fates"/>
-      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>      
+      <machine name="lawrencium-lr3" compiler="intel" category="fates"/>
     </machines>
     <options>
       <option name="wallclock">00:40:00</option>
