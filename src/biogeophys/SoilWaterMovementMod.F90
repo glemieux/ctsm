@@ -262,6 +262,7 @@ contains
     use SoilWaterRetentionCurveMod, only : soil_water_retention_curve_type
     use clm_varcon        , only : denh2o, denice
     use clm_varctl,  only : use_flexibleCN   
+    use clm_varctl      , only : iulog
     !
     ! !ARGUMENTS:
     type(bounds_type)        , intent(in)    :: bounds                ! bounds
@@ -294,6 +295,7 @@ contains
       h2osoi_liq         =>    waterstatebulk_inst%h2osoi_liq_col          & ! Output: [real(r8) (:,:) ] liquid water (kg/m2)
     )      
 
+    write(iulog,*) 'SoilWater: soilwater_movement_method: ', soilwater_movement_method
     select case(soilwater_movement_method)
 
     case (zengdecker_2009)
@@ -328,6 +330,7 @@ contains
 
     end select
 
+    write(iulog,*) 'SoilWater: use_flexibleCN: ', use_flexibleCN
     if (use_flexibleCN) then
        !a work around of the negative liquid water. Jinyun Tang, Jan 14, 2015
        watmin = 0.001_r8
@@ -1196,7 +1199,7 @@ contains
          ! set number of layers over which to solve soilwater movement
          nlayers = nbedrock(c)
 
-         dwat_temp = 0.
+         dwat_temp = 0._r8
 
          ! initialize the number of substeps
          nsubstep=0
@@ -1246,6 +1249,7 @@ contains
                  dqodw1(c,1:nlayers), &
                  dqodw2(c,1:nlayers))
 
+            write(iulog,*) 'soilwater_moisture_form:  pre-compute_RHS qflx_rootsoi_col: ', qflx_rootsoi_col(c,1:nlayers)
             ! RHS of system of equations
             call compute_RHS_moisture_form(c, nlayers, &           
                  qflx_rootsoi_col(c,1:nlayers), &
@@ -1254,6 +1258,7 @@ contains
                  qout(c,1:nlayers), &
                  dt_dz(c,1:nlayers), &
                  rmx(c,1:nlayers))
+            write(iulog,*) 'soilwater_moisture_form:  port-compute_RHS qflx_rootsoi_col: ', qflx_rootsoi_col(c,1:nlayers)
             
             ! LHS of system of equations
             call compute_LHS_moisture_form(c, nlayers, &
@@ -1373,6 +1378,8 @@ contains
             ! Renew the mass of liquid water
             do j = 1, nlayers
                h2osoi_liq(c,j) = h2osoi_liq(c,j) + dwat(c,j) * (m_to_mm * dz(c,j))
+               write(iulog,*) 'soilwater_moisture_form:  h2osoi_liq(c,j): ', h2osoi_liq(c,j)
+               write(iulog,*) 'soilwater_moisture_form:  dwat(c,j),dz(c,j): ', dwat(c,j), dz(c,j)
             end do
 
              ! compute drainage from the bottom of the soil column

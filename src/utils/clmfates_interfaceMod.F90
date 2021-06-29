@@ -2740,6 +2740,7 @@ module CLMFatesInterfaceMod
 
        ! This is the water removed from the soil layers by roots (or added)
        waterfluxbulk_inst%qflx_rootsoi_col(c,1:nlevsoil) = this%fates(nc)%bc_out(s)%qflx_soil2root_sisl(1:nlevsoil)
+       write(iulog,*) 'ComputeRootSoilFlux: waterfluxbulk_inst%qflx_rootsoi_col: ', waterfluxbulk_inst%qflx_rootsoi_col(c,1:nlevsoil)
 
        ! This is the total amount of water transferred to surface runoff
        ! (this is generated potentially from supersaturating soils

@@ -341,12 +341,15 @@ contains
       call UpdateUrbanPonding(bounds, num_urbanc, filter_urbanc, &
            b_waterstate_inst, soilhydrology_inst, b_waterflux_inst)
       write(iulog,*) 'HydrologyNoDrainage: UpdateUrbanPonding: ', h2osoi_liq
+      write(iulog,*) 'HydrologyNoDrainage: UpdateUrbanPonding rootsoi: ', b_waterflux_inst%qflx_rootsoi_col
 
       call Compute_EffecRootFrac_And_VertTranSink(bounds, num_hydrologyc, &
            filter_hydrologyc, soilstate_inst, canopystate_inst, b_waterflux_inst, energyflux_inst)
 
       if ( use_fates ) then
          call clm_fates%ComputeRootSoilFlux(bounds, num_hydrologyc, filter_hydrologyc, soilstate_inst, b_waterflux_inst)
+         write(iulog,*) 'HydrologyNoDrainage: clm_fates%ComputeRootSoilFlux: ', h2osoi_liq
+         write(iulog,*) 'HydrologyNoDrainage: clm_fates%ComputeRootSoilFlux rootsoi: ', b_waterflux_inst%qflx_rootsoi_col
       end if
 
       call SoilWater(bounds, num_hydrologyc, filter_hydrologyc, num_urbanc, filter_urbanc, &
