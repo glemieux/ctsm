@@ -862,6 +862,7 @@ module CLMFatesInterfaceMod
                  this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                endif
            end do ! p
+           write(iulog,*) 'dynamics_driv: hlm_sp_tsai/tsai_patch: ', his%fates(nc)%bc_in(s)%hlm_sp_tsai
          end if ! SP
 
          if(use_fates_planthydro)then
@@ -914,10 +915,12 @@ module CLMFatesInterfaceMod
 
       do s = 1,this%fates(nc)%nsites
 
+            write(iulog,*) 'dynamics_driv: ed_ecosystem_dynamics'
             call ed_ecosystem_dynamics(this%fates(nc)%sites(s),    &
                   this%fates(nc)%bc_in(s), &
                   this%fates(nc)%bc_out(s))
 
+            write(iulog,*) 'dynamics_driv: ed_update_site'
             call ed_update_site(this%fates(nc)%sites(s), &
                   this%fates(nc)%bc_in(s), &
                   this%fates(nc)%bc_out(s))
@@ -954,6 +957,7 @@ module CLMFatesInterfaceMod
       ! Part III.2 (continued).
       ! Update diagnostics of the FATES ecosystem structure that are used in the HLM.
       ! ---------------------------------------------------------------------------------
+      write(iulog,*) 'dynamics_driv: wrap_update_hlmfates_dyn'
       call this%wrap_update_hlmfates_dyn(nc,               &
                                          bounds_clump,     &
                                          waterdiagnosticbulk_inst,  &
@@ -963,6 +967,7 @@ module CLMFatesInterfaceMod
       ! Part IV:
       ! Update history IO fields that depend on ecosystem dynamics
       ! ---------------------------------------------------------------------------------
+      write(iulog,*) 'dynamics_driv: update_history_dyn'
       call this%fates_hist%update_history_dyn( nc,                    &
                                               this%fates(nc)%nsites, &
                                               this%fates(nc)%sites)
@@ -1130,7 +1135,7 @@ module CLMFatesInterfaceMod
              esai(p) = this%fates(nc)%bc_out(s)%esai_pa(ifp)
              htop(p) = this%fates(nc)%bc_out(s)%htop_pa(ifp)
              hbot(p) = this%fates(nc)%bc_out(s)%hbot_pa(ifp)
-             
+
              write(iulog,*) 'wrapupdatehlmfatesdyn: p,esai(p): ', p,esai(p)
 
              if(use_fates_sp.and.abs(tlai(p)-this%fates(nc)%bc_out(s)%tlai_pa(ifp)).gt.1e-09)then
@@ -1313,7 +1318,7 @@ module CLMFatesInterfaceMod
          !$OMP PARALLEL DO PRIVATE (nc)
          do nc = 1, nclumps
             if (this%fates(nc)%nsites>0) then
-               write(iulog,*) 'restart:this%fates_restart%set_restart_vectors' 
+               write(iulog,*) 'restart:this%fates_restart%set_restart_vectors'
                call this%fates_restart%set_restart_vectors(nc,this%fates(nc)%nsites, &
                                                            this%fates(nc)%sites)
             end if
@@ -1393,7 +1398,7 @@ module CLMFatesInterfaceMod
                ! ------------------------------------------------------------------------
                ! Convert newly read-in vectors into the FATES namelist state variables
                ! ------------------------------------------------------------------------
-               write(iulog,*) 'restart:this%fates_restart%create_patchcohort_structure' 
+               write(iulog,*) 'restart:this%fates_restart%create_patchcohort_structure'
                call this%fates_restart%create_patchcohort_structure(nc, &
                     this%fates(nc)%nsites, this%fates(nc)%sites, this%fates(nc)%bc_in)
 
@@ -1435,7 +1440,7 @@ module CLMFatesInterfaceMod
                            this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                         endif
                      end do ! p
-                     write(iulog,*) 'restart: this%fates(nc)%bc_in(s)%hlm_sp_tsai: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
+                     write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
                   end do ! c
                 end if ! SP
 
