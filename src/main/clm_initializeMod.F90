@@ -623,7 +623,6 @@ contains
     deallocate(wt_nat_patch)
 
     ! Initialise the fates model state structure
-    write(iulog,*)'initialize2: init_coldstart()'
     if ( use_fates .and. .not.is_restart() .and. finidat == ' ') then
        ! If fates is using satellite phenology mode, make sure to call the SatellitePhenology
        ! procedure prior to init_coldstart which will eventually call leaf_area_profile
@@ -637,6 +636,7 @@ contains
           end do
           !$OMP END PARALLEL DO
        end if
+       write(iulog,*)'initialize2: init_coldstart()'
        call clm_fates%init_coldstart(water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, canopystate_inst, &
             soilstate_inst)

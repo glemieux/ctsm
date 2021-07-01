@@ -345,6 +345,7 @@ contains
 
       call Compute_EffecRootFrac_And_VertTranSink(bounds, num_hydrologyc, &
            filter_hydrologyc, soilstate_inst, canopystate_inst, b_waterflux_inst, energyflux_inst)
+      write(iulog,*) 'HydrologyNoDrainage: Compute_EffecRootFrac_And_VertTranSink rootsoi: ', b_waterflux_inst%qflx_rootsoi_col
 
       if ( use_fates ) then
          call clm_fates%ComputeRootSoilFlux(bounds, num_hydrologyc, filter_hydrologyc, soilstate_inst, b_waterflux_inst)

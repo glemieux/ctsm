@@ -62,6 +62,8 @@ contains
       integer  :: c
       integer  :: l
 
+      write(iulog,*) 'ComputeRootFracVertSing: use_hydrstress: ', use_hydrstress
+
       num_filterc_tot = 0
 
       ! 1) pervious roads
@@ -74,6 +76,9 @@ contains
          end if
       end do
       num_filterc_tot = num_filterc_tot+num_filterc
+      write(iulog,*) 'ComputeRootFracVertSing: num_filterc1: ', num_filterc
+      write(iulog,*) 'ComputeRootFracVertSing: filterc1: ', filterc 
+      write(iulog,*) 'ComputeRootFracVertSing: num_filterc_tot1: ', num_filterc_tot
       if(use_hydrstress) then
          call Compute_EffecRootFrac_And_VertTranSink_HydStress_Roads(bounds, &
                num_filterc,filterc, soilstate_inst, waterfluxbulk_inst)
@@ -100,6 +105,9 @@ contains
          end if
       end do
       num_filterc_tot = num_filterc_tot+num_filterc
+      write(iulog,*) 'ComputeRootFracVertSing: num_filterc2: ', num_filterc
+      write(iulog,*) 'ComputeRootFracVertSing: filterc2: ', filterc 
+      write(iulog,*) 'ComputeRootFracVertSing: num_filterc_tot2: ', num_filterc_tot
       if(use_hydrstress) then
          call Compute_EffecRootFrac_And_VertTranSink_HydStress(bounds, &
                num_filterc, filterc, waterfluxbulk_inst, soilstate_inst, &
@@ -121,6 +129,9 @@ contains
          end if
       end do
       num_filterc_tot = num_filterc_tot+num_filterc
+      write(iulog,*) 'ComputeRootFracVertSing: num_filterc3: ', num_filterc
+      write(iulog,*) 'ComputeRootFracVertSing: filterc3: ', filterc 
+      write(iulog,*) 'ComputeRootFracVertSing: num_filterc_tot3: ', num_filterc_tot
       if (use_hydrstress) then
          call Compute_EffecRootFrac_And_VertTranSink_HydStress(bounds, &
               num_filterc, filterc, waterfluxbulk_inst, soilstate_inst, &
@@ -400,29 +411,44 @@ contains
       end do
       
       do pi = 1,max_patch_per_col
+         write(iulog,*) 'ComputeRootFracVertSing: part 1'
          do j = 1,nlevsoi
             do fc = 1, num_filterc
                c = filterc(fc)
+               write(iulog,*) 'ComputeRootFracVertSing: pi,c, col%npatches(c) 1: ', pi,c, col%npatches(c)
                if (pi <= col%npatches(c)) then
                   p = col%patchi(c) + pi - 1
+                  write(iulog,*) 'ComputeRootFracVertSing: pi,c,p,patch%active(p) 1: ', pi,c,p,patch%active(p)
                   if (patch%active(p)) then
                      rootr_col(c,j) = rootr_col(c,j) + rootr_patch(p,j) * &
                            qflx_tran_veg_patch(p) * patch%wtcol(p)
+                     write(iulog,*) 'ComputeRootFracVertSing: pi,j,fc,c,p 1: ', pi,j,fc,c,p
+                     write(iulog,*) 'ComputeRootFracVertSing: rootr_col(c,j) 1: ', rootr_col(c,j)
+                     write(iulog,*) 'ComputeRootFracVertSing: rootr_patch(c,j) 1: ', rootr_patch(c,j)
+                     write(iulog,*) 'ComputeRootFracVertSing: qflx_tran_veg_patch(p) 1: ', qflx_tran_veg_patch(p) 
+                     write(iulog,*) 'ComputeRootFracVertSing: patch%wtcol(p) 1: ', patch%wtcol(p) 
                   end if
                end if
             end do
          end do
+         write(iulog,*) 'ComputeRootFracVertSing: part 2'
          do fc = 1, num_filterc
             c = filterc(fc)
+            write(iulog,*) 'ComputeRootFracVertSing: pi,c, col%npatches(c) 2: ', pi,c, col%npatches(c)
             if (pi <= col%npatches(c)) then
                p = col%patchi(c) + pi - 1
+               write(iulog,*) 'ComputeRootFracVertSing: pi,c,p,patch%active(p) 2: ', pi,c,p,patch%active(p)
                if (patch%active(p)) then
                   temp(c) = temp(c) + qflx_tran_veg_patch(p) * patch%wtcol(p)
+                  write(iulog,*) 'ComputeRootFracVertSing: pi,fc,c,p 2: ', pi,fc,c,p
+                  write(iulog,*) 'ComputeRootFracVertSing: qflx_tran_veg_patch(p) 2: ', qflx_tran_veg_patch(p) 
+                  write(iulog,*) 'ComputeRootFracVertSing: patch%wtcol(p) 2: ', patch%wtcol(p) 
                end if
             end if
          end do
       end do
       
+      write(iulog,*) 'ComputeRootFracVertSing: part 3'
       do j = 1, nlevsoi
          do fc = 1, num_filterc
             c = filterc(fc)
@@ -430,6 +456,9 @@ contains
                rootr_col(c,j) = rootr_col(c,j)/temp(c)
             end if
             qflx_rootsoi_col(c,j) = rootr_col(c,j)*qflx_tran_veg_col(c)
+            write(iulog,*) 'ComputeRootFracVertSing: j,fc,c 3: ', j,fc,c
+            write(iulog,*) 'ComputeRootFracVertSing: rootr_col(c,j) 3: ', rootr_col(c,j)
+            write(iulog,*) 'ComputeRootFracVertSing: qflx_tran_veg_col(c) 3: ', qflx_tran_veg_col(c) 
 
          end do
       end do

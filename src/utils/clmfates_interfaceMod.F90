@@ -1130,6 +1130,8 @@ module CLMFatesInterfaceMod
              esai(p) = this%fates(nc)%bc_out(s)%esai_pa(ifp)
              htop(p) = this%fates(nc)%bc_out(s)%htop_pa(ifp)
              hbot(p) = this%fates(nc)%bc_out(s)%hbot_pa(ifp)
+             
+             write(iulog,*) 'wrapupdatehlmfatesdyn: p,esai(p): ', p,esai(p)
 
              if(use_fates_sp.and.abs(tlai(p)-this%fates(nc)%bc_out(s)%tlai_pa(ifp)).gt.1e-09)then
                write(iulog,*) 'fates lai not like hlm lai',tlai(p),this%fates(nc)%bc_out(s)%tlai_pa(ifp),ifp
@@ -1311,6 +1313,7 @@ module CLMFatesInterfaceMod
          !$OMP PARALLEL DO PRIVATE (nc)
          do nc = 1, nclumps
             if (this%fates(nc)%nsites>0) then
+               write(iulog,*) 'restart:this%fates_restart%set_restart_vectors' 
                call this%fates_restart%set_restart_vectors(nc,this%fates(nc)%nsites, &
                                                            this%fates(nc)%sites)
             end if
@@ -1390,6 +1393,7 @@ module CLMFatesInterfaceMod
                ! ------------------------------------------------------------------------
                ! Convert newly read-in vectors into the FATES namelist state variables
                ! ------------------------------------------------------------------------
+               write(iulog,*) 'restart:this%fates_restart%create_patchcohort_structure' 
                call this%fates_restart%create_patchcohort_structure(nc, &
                     this%fates(nc)%nsites, this%fates(nc)%sites, this%fates(nc)%bc_in)
 
@@ -1397,6 +1401,7 @@ module CLMFatesInterfaceMod
                !    call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
                !end if
 
+               write(iulog,*) 'restart: get_restart_vectors'
                call this%fates_restart%get_restart_vectors(nc, this%fates(nc)%nsites, &
                     this%fates(nc)%sites )
 
@@ -1430,6 +1435,7 @@ module CLMFatesInterfaceMod
                            this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                         endif
                      end do ! p
+                     write(iulog,*) 'restart: this%fates(nc)%bc_in(s)%hlm_sp_tsai: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
                   end do ! c
                 end if ! SP
 
@@ -1471,12 +1477,14 @@ module CLMFatesInterfaceMod
                ! ------------------------------------------------------------------------
                ! Update diagnostics of FATES ecosystem structure used in HLM.
                ! ------------------------------------------------------------------------
+               write(iulog,*) 'restart: this%wrap_update_hlmfates_dyn'
                call this%wrap_update_hlmfates_dyn(nc,bounds_clump, &
                      waterdiagnosticbulk_inst,canopystate_inst)
 
                ! ------------------------------------------------------------------------
                ! Update the 3D patch level radiation absorption fractions
                ! ------------------------------------------------------------------------
+               write(iulog,*) 'restart: this%fates_restart%update_3dpatch_radiation'
                call this%fates_restart%update_3dpatch_radiation(this%fates(nc)%nsites, &
                                                                 this%fates(nc)%sites, &
                                                                 this%fates(nc)%bc_out)
@@ -2169,6 +2177,9 @@ module CLMFatesInterfaceMod
 
          do ifp = 1,this%fates(nc)%sites(s)%youngest_patch%patchno
            p = ifp+col%patchi(c)
+
+          write(iulog,*) 'wraprad: s,c,p,ifp: ',s,c,p,ifp
+          write(iulog,*) 'wraprad: filter_vegsol: ', filter_vegsol
 
           if( any(filter_vegsol==p) )then
 

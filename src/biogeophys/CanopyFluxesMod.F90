@@ -1136,6 +1136,9 @@ bioms:   do f = 1, fn
                canopy_cond(p) = (laisun(p)/(rb(p)+rssun(p)) + laisha(p)/(rb(p)+rssha(p)))/max(elai(p), 0.01_r8)
             end if
 
+            write(iulog,*) 'CanopyFluxes: c,forc_rho(c): ', c,forc_rho(c)
+            write(iulog,*) 'CanopyFluxes: p,elai(p),esai(p),rb(p): ', p,elai(p),esai(p),rb(p) 
+            write(iulog,*) 'CanopyFluxes: p,qsatl(p),qaf(p): ', p,qsatl(p),qaf(p)
             efpot = forc_rho(c)*((elai(p)+esai(p))/rb(p))*(qsatl(p)-qaf(p))
             h2ocan = liqcan(p) + snocan(p)
 
@@ -1154,7 +1157,9 @@ bioms:   do f = 1, fn
                  rpp = 1._r8
               end if
             else
+                 write(iulog,*) 'CanopyFluxes: efpot1: ', efpot
               if (efpot > 0._r8) then
+                 write(iulog,*) 'CanopyFluxes: p,btran(p),btran0 1: ', p,btran(p),btran0
                  if (btran(p) > btran0) then
                     qflx_tran_veg(p) = efpot*rppdry
                     rpp = rppdry + fwet(p)
@@ -1280,6 +1285,8 @@ bioms:   do f = 1, fn
                qflx_evap_veg(p) = min(qflx_evap_veg(p),qflx_tran_veg(p)+h2ocan/dtime)
             else
                ecidif = 0._r8
+               write(iulog,*) 'CanopyFluxes: efpot2 ', efpot
+               write(iulog,*) 'CanopyFluxes: p,btran(p),btran0 2: ', p,btran(p),btran0
                if (efpot > 0._r8 .and. btran(p) > btran0) then
                   qflx_tran_veg(p) = efpot*rppdry
                else
