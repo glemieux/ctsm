@@ -1192,6 +1192,7 @@ module CLMFatesInterfaceMod
      use EDMainMod, only :        ed_update_site
      use FatesInterfaceTypesMod, only:  fates_maxElementsPerSite
      use clm_instur       , only : wt_nat_patch
+     use EDCanopyStructureMod, only : assign_cohort_SP_properties
      !use EDPhysiologyMod, only : satellite_phenology
 
       implicit none
@@ -1441,7 +1442,9 @@ module CLMFatesInterfaceMod
                         endif
                      end do ! p
                      write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
-                  end do ! c
+                     write(iulog,*) 'restart: callign satellite_phenology'
+                     call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
+                  end do ! s,c
                 end if ! SP
 
                ! ------------------------------------------------------------------------
