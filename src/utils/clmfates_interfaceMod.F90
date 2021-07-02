@@ -1582,6 +1582,7 @@ module CLMFatesInterfaceMod
                         this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                      endif
                   end do ! p
+                  write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
                end do ! c
             end if ! SP
 
