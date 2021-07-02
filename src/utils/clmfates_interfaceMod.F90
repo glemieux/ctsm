@@ -862,7 +862,7 @@ module CLMFatesInterfaceMod
                  this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                endif
            end do ! p
-           write(iulog,*) 'dynamics_driv: hlm_sp_tsai/tsai_patch: ', his%fates(nc)%bc_in(s)%hlm_sp_tsai
+           write(iulog,*) 'dynamics_driv: hlm_sp_tsai/tsai_patch: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
          end if ! SP
 
          if(use_fates_planthydro)then
