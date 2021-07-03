@@ -1035,11 +1035,13 @@ module CLMFatesInterfaceMod
        end do
 
        ! Canopy diagnostics for FATES
+       write(iulog,*) 'wrap_update_hlmfates_dyn: canopy_summarization'
        call canopy_summarization(this%fates(nc)%nsites, &
             this%fates(nc)%sites,  &
             this%fates(nc)%bc_in)
 
        ! Canopy diagnostic outputs for HLM
+       write(iulog,*) 'wrap_update_hlmfates_dyn: update_hlm_dynamics'
        call update_hlm_dynamics(this%fates(nc)%nsites, &
             this%fates(nc)%sites,  &
             this%f2hmap(nc)%fcolumn, &
@@ -1136,7 +1138,7 @@ module CLMFatesInterfaceMod
              htop(p) = this%fates(nc)%bc_out(s)%htop_pa(ifp)
              hbot(p) = this%fates(nc)%bc_out(s)%hbot_pa(ifp)
 
-             write(iulog,*) 'wrapupdatehlmfatesdyn: p,esai(p): ', p,esai(p)
+             write(iulog,*) 'wrap_update_hlmfates_dyn: p,esai(p): ', p,esai(p)
 
              if(use_fates_sp.and.abs(tlai(p)-this%fates(nc)%bc_out(s)%tlai_pa(ifp)).gt.1e-09)then
                write(iulog,*) 'fates lai not like hlm lai',tlai(p),this%fates(nc)%bc_out(s)%tlai_pa(ifp),ifp
