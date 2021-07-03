@@ -985,7 +985,7 @@ module CLMFatesInterfaceMod
    ! ------------------------------------------------------------------------------------
 
    subroutine wrap_update_hlmfates_dyn(this, nc, bounds_clump,      &
-        waterdiagnosticbulk_inst, canopystate_inst)
+        waterdiagnosticbulk_inst, canopystate_inst,startcase_flag)
 
       ! ---------------------------------------------------------------------------------
       ! This routine handles the updating of vegetation canopy diagnostics, (such as lai)
@@ -999,6 +999,7 @@ module CLMFatesInterfaceMod
      integer                 , intent(in)           :: nc
      type(waterdiagnosticbulk_type)   , intent(inout)        :: waterdiagnosticbulk_inst
      type(canopystate_type)  , intent(inout)        :: canopystate_inst
+     logical, optional, intent(in)                  :: startcase_flag
 
      integer :: npatch  ! number of patches in each site
      integer  :: icp     ! counter for FATES patches
@@ -1007,6 +1008,7 @@ module CLMFatesInterfaceMod
      integer :: s       ! site index
      integer :: c       ! column index
      integer :: g       ! grid cell
+     logical :: restart_flag ! flag for restart
 
      real(r8) :: areacheck
      call t_startf('fates_wrap_update_hlmfates_dyn')
@@ -1025,6 +1027,14 @@ module CLMFatesInterfaceMod
          frac_sno_eff => waterdiagnosticbulk_inst%frac_sno_eff_col, &
          frac_veg_nosno_alb => canopystate_inst%frac_veg_nosno_alb_patch)
 
+       ! set internal case flag to determine which procedure is calling wrap_update_hlmfates_dyn
+       ! currently only used for one case
+       if (present(startcase_flag)) then
+          restart_flag = .true.
+       else
+          restart_flag = .false.
+       end if
+
 
        ! Process input boundary conditions to FATES
        ! --------------------------------------------------------------------------------
@@ -1037,7 +1047,7 @@ module CLMFatesInterfaceMod
        ! Canopy diagnostics for FATES
        call canopy_summarization(this%fates(nc)%nsites, &
             this%fates(nc)%sites,  &
-            this%fates(nc)%bc_in)
+            this%fates(nc)%bc_in,restart_flag)
 
        ! Canopy diagnostic outputs for HLM
        call update_hlm_dynamics(this%fates(nc)%nsites, &
@@ -1225,6 +1235,7 @@ module CLMFatesInterfaceMod
       integer                 :: nvar
       integer                 :: ivar
       logical                 :: readvar
+      logical                 :: restart_flag = .true.
 
       logical, save           :: initialized = .false.
 
@@ -1402,10 +1413,6 @@ module CLMFatesInterfaceMod
                call this%fates_restart%create_patchcohort_structure(nc, &
                     this%fates(nc)%nsites, this%fates(nc)%sites, this%fates(nc)%bc_in)
 
-               !if (use_fates_sp) then
-               !    call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
-               !end if
-
                write(iulog,*) 'restart: get_restart_vectors'
                call this%fates_restart%get_restart_vectors(nc, this%fates(nc)%nsites, &
                     this%fates(nc)%sites )
@@ -1486,7 +1493,7 @@ module CLMFatesInterfaceMod
                ! ------------------------------------------------------------------------
                write(iulog,*) 'restart: this%wrap_update_hlmfates_dyn'
                call this%wrap_update_hlmfates_dyn(nc,bounds_clump, &
-                     waterdiagnosticbulk_inst,canopystate_inst)
+                     waterdiagnosticbulk_inst,canopystate_inst,restart_flag)
 
                ! ------------------------------------------------------------------------
                ! Update the 3D patch level radiation absorption fractions
