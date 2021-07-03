@@ -1008,7 +1008,6 @@ module CLMFatesInterfaceMod
      integer :: s       ! site index
      integer :: c       ! column index
      integer :: g       ! grid cell
-     logical :: restart_flag ! flag for restart
 
      real(r8) :: areacheck
      call t_startf('fates_wrap_update_hlmfates_dyn')
