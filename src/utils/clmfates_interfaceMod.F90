@@ -1027,14 +1027,6 @@ module CLMFatesInterfaceMod
          frac_sno_eff => waterdiagnosticbulk_inst%frac_sno_eff_col, &
          frac_veg_nosno_alb => canopystate_inst%frac_veg_nosno_alb_patch)
 
-       ! set internal case flag to determine which procedure is calling wrap_update_hlmfates_dyn
-       ! currently only used for one case
-       if (present(startcase_flag)) then
-          restart_flag = .true.
-       else
-          restart_flag = .false.
-       end if
-
 
        ! Process input boundary conditions to FATES
        ! --------------------------------------------------------------------------------
@@ -1047,7 +1039,7 @@ module CLMFatesInterfaceMod
        ! Canopy diagnostics for FATES
        call canopy_summarization(this%fates(nc)%nsites, &
             this%fates(nc)%sites,  &
-            this%fates(nc)%bc_in,restart_flag)
+            this%fates(nc)%bc_in,startcase_flag)
 
        ! Canopy diagnostic outputs for HLM
        call update_hlm_dynamics(this%fates(nc)%nsites, &
