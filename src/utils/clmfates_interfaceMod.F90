@@ -1443,6 +1443,8 @@ module CLMFatesInterfaceMod
                         endif
                      end do ! p
                      write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
+                     write(iulog,*) 'restart: calling satellite_phenology'
+                     call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
                   end do ! c
                 end if ! SP
 
