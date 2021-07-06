@@ -1194,7 +1194,7 @@ module CLMFatesInterfaceMod
      use EDMainMod, only :        ed_update_site
      use FatesInterfaceTypesMod, only:  fates_maxElementsPerSite
      use clm_instur       , only : wt_nat_patch
-     !use EDPhysiologyMod, only : satellite_phenology
+     use EDPhysiologyMod, only : satellite_phenology
 
       implicit none
 
