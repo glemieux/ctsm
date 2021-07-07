@@ -1429,6 +1429,15 @@ module CLMFatesInterfaceMod
 
                end do
 
+               do s = 1,this%fates(nc)%nsites
+                  c = this%f2hmap(nc)%fcolumn(s)
+                  do ft = natpft_lb,natpft_ub !set of pfts in HLM
+                     ! here we are mapping from P space in the HLM to FT space in the sp_input arrays.
+                     p = ft + col%patchi(c) ! for an FT of 1 we want to use
+                     write(iulog,*) 'restart: pre-hlm_sp_tsai/tsai_patch 1: ', canopystate_inst%tsai_patch(p)
+                  enddo
+               enddo
+
                if(use_fates_sp)then
                   do s = 1,this%fates(nc)%nsites
                      c = this%f2hmap(nc)%fcolumn(s)
@@ -1441,8 +1450,9 @@ module CLMFatesInterfaceMod
                         if(canopystate_inst%htop_patch(p).lt.1.0e-20)then ! zero htop causes inifinite/nans. This is
                            this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                         endif
+                        write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch 2a: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai(ft)
+                        write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch 2b: ', canopystate_inst%tsai_patch(p)
                      end do ! p
-                     write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
                      write(iulog,*) 'restart: calling satellite_phenology'
                      call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
                   end do ! c
