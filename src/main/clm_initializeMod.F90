@@ -590,7 +590,7 @@ contains
        end if
     ! If fates has satellite phenology enabled, get the monthly veg values
     ! prior to the first call to SatellitePhenology()
-    elseif ( use_fates_sp ) then
+    elseif ( use_fates_sp .and. .not.is_restart() ) then
           write(iulog,*)'initialize2: interpMonthlyVeg'
           call interpMonthlyVeg(bounds_proc, canopystate_inst)
     end if
@@ -640,15 +640,15 @@ contains
        call clm_fates%init_coldstart(water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, canopystate_inst, &
             soilstate_inst)
-    elseif ( use_fates_sp .and. is_restart() ) then
-      write(iulog,*)'initialize2: pre-restart SatellitePhenology()'
-      !$OMP PARALLEL DO PRIVATE (nc, bounds_clump)
-      do nc = 1,nclumps
-         call get_clump_bounds(nc, bounds_clump)
-         call SatellitePhenology(bounds_clump, filter(nc)%num_nolakep, filter(nc)%nolakep, &
-              water_inst%waterdiagnosticbulk_inst, canopystate_inst)
-      end do
-      !$OMP END PARALLEL DO
+   !  elseif ( use_fates_sp .and. is_restart() ) then
+   !    write(iulog,*)'initialize2: pre-restart SatellitePhenology()'
+   !    !$OMP PARALLEL DO PRIVATE (nc, bounds_clump)
+   !    do nc = 1,nclumps
+   !       call get_clump_bounds(nc, bounds_clump)
+   !       call SatellitePhenology(bounds_clump, filter(nc)%num_nolakep, filter(nc)%nolakep, &
+   !            water_inst%waterdiagnosticbulk_inst, canopystate_inst)
+   !    end do
+   !    !$OMP END PARALLEL DO
     end if
 
     ! topo_glc_mec was allocated in initialize1, but needed to be kept around through
