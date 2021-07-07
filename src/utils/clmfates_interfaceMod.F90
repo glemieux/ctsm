@@ -848,6 +848,15 @@ module CLMFatesInterfaceMod
 
          end do
 
+         do s = 1,this%fates(nc)%nsites
+            c = this%f2hmap(nc)%fcolumn(s)
+            do ft = natpft_lb,natpft_ub !set of pfts in HLM
+               ! here we are mapping from P space in the HLM to FT space in the sp_input arrays.
+               p = ft + col%patchi(c) ! for an FT of 1 we want to use
+               write(iulog,*) 'dynamics_driv: pre-hlm_sp_tsai/tsai_patch 1: ', canopystate_inst%tsai_patch(p)
+            enddo
+         enddo
+
          ! Here we use the same logic as the pft_areafrac initialization to get an array with values for each pft
          ! in FATES.
          ! N.B. Fow now these are fixed values pending HLM updates.
@@ -861,8 +870,8 @@ module CLMFatesInterfaceMod
                if(canopystate_inst%htop_patch(p).lt.1.0e-20)then ! zero htop causes inifinite/nans. This is
                  this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                endif
+               write(iulog,*) 'dynamics_driv: hlm_sp_tsai/tsai_patch 2: ', canopystate_inst%tsai_patch(p)
            end do ! p
-           write(iulog,*) 'dynamics_driv: hlm_sp_tsai/tsai_patch: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai
          end if ! SP
 
          if(use_fates_planthydro)then
@@ -1076,6 +1085,9 @@ module CLMFatesInterfaceMod
 
           c = this%f2hmap(nc)%fcolumn(s)
 
+
+          write(iulog,*) 'wrap_update_hlmfates_dyn: tsai_hist_patch pre-zero: ', tsai(col%patchi(c):col%patchf(c))
+
           ! Other modules may have AI's we only flush values
           ! that are on the naturally vegetated columns
           elai(col%patchi(c):col%patchf(c)) = 0.0_r8
@@ -1084,6 +1096,7 @@ module CLMFatesInterfaceMod
           tsai(col%patchi(c):col%patchf(c)) = 0.0_r8
           htop(col%patchi(c):col%patchf(c)) = 0.0_r8
           hbot(col%patchi(c):col%patchf(c)) = 0.0_r8
+          write(iulog,*) 'wrap_update_hlmfates_dyn: tsai_hist_patch post-zero: ', tsai(col%patchi(c):col%patchf(c))
 
           ! FATES does not dictate bare-ground so turbulent
           ! variables are not over-written.
@@ -1131,6 +1144,8 @@ module CLMFatesInterfaceMod
 
              areacheck = areacheck + patch%wt_ed(p)
 
+             write(iulog,*) 'wrap_update_hlmfates_dyn: pre-bc_out: p,esai(p): ', p,esai(p)
+
              tlai(p) = this%fates(nc)%bc_out(s)%tlai_pa(ifp)
              elai(p) = this%fates(nc)%bc_out(s)%elai_pa(ifp)
              tsai(p) = this%fates(nc)%bc_out(s)%tsai_pa(ifp)
@@ -1138,7 +1153,7 @@ module CLMFatesInterfaceMod
              htop(p) = this%fates(nc)%bc_out(s)%htop_pa(ifp)
              hbot(p) = this%fates(nc)%bc_out(s)%hbot_pa(ifp)
 
-             write(iulog,*) 'wrap_update_hlmfates_dyn: p,esai(p): ', p,esai(p)
+             write(iulog,*) 'wrap_update_hlmfates_dyn: post-bc_out: p,esai(p): ', p,esai(p)
 
              if(use_fates_sp.and.abs(tlai(p)-this%fates(nc)%bc_out(s)%tlai_pa(ifp)).gt.1e-09)then
                write(iulog,*) 'fates lai not like hlm lai',tlai(p),this%fates(nc)%bc_out(s)%tlai_pa(ifp),ifp
@@ -1450,8 +1465,7 @@ module CLMFatesInterfaceMod
                         if(canopystate_inst%htop_patch(p).lt.1.0e-20)then ! zero htop causes inifinite/nans. This is
                            this%fates(nc)%bc_in(s)%hlm_sp_htop(ft) = 0.01_r8
                         endif
-                        write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch 2a: ', this%fates(nc)%bc_in(s)%hlm_sp_tsai(ft)
-                        write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch 2b: ', canopystate_inst%tsai_patch(p)
+                        write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch 2: ', canopystate_inst%tsai_patch(p)
                      end do ! p
                      write(iulog,*) 'restart: calling satellite_phenology'
                      call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
