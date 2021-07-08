@@ -516,6 +516,8 @@ contains
        this%hbot_patch(p)        = 0._r8
        this%vegwp_patch(p,:)     = -2.5e4_r8
 
+       write(iulog,*) 'canopystate_inst%initcold: tsai_patch zero'
+
        if (lun%itype(l) == istsoil .or. lun%itype(l) == istcrop) then
           this%laisun_patch(p) = 0._r8
           this%laisha_patch(p) = 0._r8
@@ -580,9 +582,13 @@ contains
      dim1name='pft', long_name='one-sided leaf area index, no burying by snow', units='', &
      interpinic_flag='interp', readvar=readvar, data=this%tlai_patch)
 
+     write(iulog,*)'canopystate_inst%restart: pre-call: tsai_patch: ', this%tsai_patch
+
      call restartvar(ncid=ncid, flag=flag, varname='tsai', xtype=ncd_double,  &
           dim1name='pft', long_name='one-sided stem area index, no burying by snow', units='', &
           interpinic_flag='interp', readvar=readvar, data=this%tsai_patch)
+
+     write(iulog,*)'canopystate_inst%restart: post-call: tsai_patch: ', this%tsai_patch
 
      call restartvar(ncid=ncid, flag=flag, varname='htop', xtype=ncd_double,  &
           dim1name='pft', long_name='canopy top', units='m', &

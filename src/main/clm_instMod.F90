@@ -21,14 +21,14 @@ module clm_instMod
   ! Constants
   !-----------------------------------------
 
-  use UrbanParamsType                    , only : urbanparams_type   ! Constants 
+  use UrbanParamsType                    , only : urbanparams_type   ! Constants
   use UrbanParamsType                    , only : IsSimpleBuildTemp, IsProgBuildTemp
   use UrbanTimeVarType                   , only : urbantv_type
   use SoilBiogeochemDecompCascadeConType , only : decomp_cascade_con
-  use CNDVType                           , only : dgv_ecophyscon     ! Constants 
+  use CNDVType                           , only : dgv_ecophyscon     ! Constants
 
   !-----------------------------------------
-  ! Definition of component types 
+  ! Definition of component types
   !-----------------------------------------
 
   use ActiveLayerMod                  , only : active_layer_type
@@ -68,14 +68,14 @@ module clm_instMod
   use CNFireEmissionsMod              , only : fireemis_type
   use atm2lndType                     , only : atm2lnd_type
   use lnd2atmType                     , only : lnd2atm_type
-  use lnd2glcMod                      , only : lnd2glc_type 
+  use lnd2glcMod                      , only : lnd2glc_type
   use glc2lndMod                      , only : glc2lnd_type
   use glcBehaviorMod                  , only : glc_behavior_type
   use TopoMod                         , only : topo_type
   use GridcellType                    , only : grc
-  use LandunitType                    , only : lun                
-  use ColumnType                      , only : col                
-  use PatchType                       , only : patch                
+  use LandunitType                    , only : lun
+  use ColumnType                      , only : col
+  use PatchType                       , only : patch
   use CLMFatesInterfaceMod            , only : hlm_fates_interface_type
   use SnowCoverFractionBaseMod        , only : snow_cover_fraction_base_type
   use SnowCoverFractionFactoryMod     , only : CreateAndInitSnowCoverFraction
@@ -84,8 +84,8 @@ module clm_instMod
   !
   use SoilStateInitTimeConstMod       , only : SoilStateInitTimeConst
   use SoilHydrologyInitTimeConstMod   , only : SoilHydrologyInitTimeConst
-  use SurfaceAlbedoMod                , only : SurfaceAlbedoInitTimeConst 
-  use LakeCon                         , only : LakeConInit 
+  use SurfaceAlbedoMod                , only : SurfaceAlbedoInitTimeConst
+  use LakeCon                         , only : LakeConInit
   use SoilBiogeochemPrecisionControlMod, only: SoilBiogeochemPrecisionControlInit
   use SoilWaterMovementMod            , only : use_aquifer_layer
   !
@@ -96,7 +96,7 @@ module clm_instMod
   ! Instances of component types
   !-----------------------------------------
 
-  ! Physics types 
+  ! Physics types
   type(active_layer_type), public         :: active_layer_inst
   type(aerosol_type), public              :: aerosol_inst
   type(canopystate_type), public          :: canopystate_inst
@@ -135,7 +135,7 @@ module clm_instMod
 
   class(nutrient_competition_method_type), public, allocatable :: nutrient_competition_method
 
-  ! Soil biogeochem types 
+  ! Soil biogeochem types
   type(soilbiogeochem_state_type)        , public :: soilbiogeochem_state_inst
   type(soilbiogeochem_carbonstate_type)  , public :: soilbiogeochem_carbonstate_inst
   type(soilbiogeochem_carbonstate_type)  , public :: c13_soilbiogeochem_carbonstate_inst
@@ -168,7 +168,7 @@ contains
   !-----------------------------------------------------------------------
   subroutine clm_instReadNML( NLFilename )
     !
-    ! !ARGUMENTS    
+    ! !ARGUMENTS
     implicit none
     character(len=*), intent(IN) :: NLFilename ! Namelist filename
     ! Read in any namelists that must be read for any clm object instances that need it
@@ -183,7 +183,7 @@ contains
   !-----------------------------------------------------------------------
   subroutine clm_instInit(bounds)
     !
-    ! !USES: 
+    ! !USES:
     use clm_varpar                         , only : nlevsno
     use controlMod                         , only : nlfilename, fsurdat
     use domainMod                          , only : ldomain
@@ -191,14 +191,14 @@ contains
     use SoilBiogeochemDecompCascadeCNMod   , only : init_decompcascade_cn
     use SoilBiogeochemDecompCascadeContype , only : init_decomp_cascade_constants
     use SoilBiogeochemCompetitionMod       , only : SoilBiogeochemCompetitionInit
-    
+
     use initVerticalMod                    , only : initVertical
-    use accumulMod                         , only : print_accum_fields 
+    use accumulMod                         , only : print_accum_fields
     use SoilWaterRetentionCurveFactoryMod  , only : create_soil_water_retention_curve
     use decompMod                          , only : get_proc_bounds
     use BalanceCheckMod                    , only : GetBalanceCheckSkipSteps
     !
-    ! !ARGUMENTS    
+    ! !ARGUMENTS
     type(bounds_type), intent(in) :: bounds  ! processor bounds
     !
     ! !LOCAL VARIABLES:
@@ -217,10 +217,10 @@ contains
     !----------------------------------------------------------------------
 
     ! Note: h2osno_col and snow_depth_col are initialized as local variables
-    ! since they are needed to initialize vertical data structures  
+    ! since they are needed to initialize vertical data structures
 
-    begp = bounds%begp; endp = bounds%endp 
-    begc = bounds%begc; endc = bounds%endc 
+    begp = bounds%begp; endp = bounds%endp
+    begc = bounds%begc; endc = bounds%endc
     begl = bounds%begl; endl = bounds%endl
 
     call getfil (paramfile, locfn, 0)
@@ -243,7 +243,7 @@ contains
        ! all of the year.
        if (lun%itype(l)==istice_mec) then
           h2osno_col(c) = 100._r8
-       else if (lun%itype(l)==istsoil .and. abs(grc%latdeg(g)) >= 60._r8) then 
+       else if (lun%itype(l)==istsoil .and. abs(grc%latdeg(g)) >= 60._r8) then
           h2osno_col(c) = 100._r8
        else
           h2osno_col(c) = 0._r8
@@ -259,7 +259,7 @@ contains
     ! Initialize urban time varying data
     call urbantv_inst%Init(bounds, NLFilename)
 
-    ! Initialize vertical data components 
+    ! Initialize vertical data components
 
     call initVertical(bounds,               &
          glc_behavior, &
@@ -370,14 +370,14 @@ contains
        call soilbiogeochem_state_inst%Init(bounds)
 
        ! Initialize decompcascade constants
-       ! Note that init_decompcascade_bgc and init_decompcascade_cn need 
+       ! Note that init_decompcascade_bgc and init_decompcascade_cn need
        ! soilbiogeochem_state_inst to be initialized
 
        call init_decomp_cascade_constants( use_century_decomp )
        if (use_century_decomp) then
           call init_decompcascade_bgc(bounds, soilbiogeochem_state_inst, &
                                       soilstate_inst )
-       else 
+       else
           call init_decompcascade_cn(bounds, soilbiogeochem_state_inst)
        end if
 
@@ -393,7 +393,7 @@ contains
                c12_soilbiogeochem_carbonstate_inst=soilbiogeochem_carbonstate_inst)
        end if
 
-       call soilbiogeochem_carbonflux_inst%Init(bounds, carbon_type='c12') 
+       call soilbiogeochem_carbonflux_inst%Init(bounds, carbon_type='c12')
        if (use_c13) then
           call c13_soilbiogeochem_carbonflux_inst%Init(bounds, carbon_type='c13')
        end if
@@ -403,7 +403,7 @@ contains
 
     end if
 
-    if ( use_cn .or. use_fates) then 
+    if ( use_cn .or. use_fates) then
 
        ! Initalize soilbiogeochem nitrogen types
 
@@ -412,13 +412,13 @@ contains
             soilbiogeochem_carbonstate_inst%decomp_cpools_col(begc:endc,1:ndecomp_pools),  &
             soilbiogeochem_carbonstate_inst%decomp_cpools_1m_col(begc:endc, 1:ndecomp_pools))
 
-       call soilbiogeochem_nitrogenflux_inst%Init(bounds) 
+       call soilbiogeochem_nitrogenflux_inst%Init(bounds)
 
        ! Initialize precision control for soil biogeochemistry
        call SoilBiogeochemPrecisionControlInit( soilbiogeochem_carbonstate_inst, c13_soilbiogeochem_carbonstate_inst, &
                                                 c14_soilbiogeochem_carbonstate_inst, soilbiogeochem_nitrogenstate_inst)
 
-    end if ! end of if use_cn 
+    end if ! end of if use_cn
 
     ! Note - always call Init for bgc_vegetation_inst: some pieces need to be initialized always
     call bgc_vegetation_inst%Init(bounds, nlfilename, GetBalanceCheckSkipSteps(), params_ncid )
@@ -427,9 +427,9 @@ contains
        call crop_inst%Init(bounds)
     end if
 
-    
+
     ! Initialize the Functionaly Assembled Terrestrial Ecosystem Simulator (FATES)
-    ! 
+    !
     if (use_fates) then
        call clm_fates%Init(bounds)
     end if
@@ -442,14 +442,14 @@ contains
     ! ------------------------------------------------------------------------
 
     ! The time manager needs to be initialized before this called is made, since
-    ! the step size is needed. 
+    ! the step size is needed.
 
     call t_startf('init_accflds')
 
     call atm2lnd_inst%InitAccBuffer(bounds)
 
     call temperature_inst%InitAccBuffer(bounds)
-    
+
     call water_inst%InitAccBuffer(bounds)
 
     call energyflux_inst%InitAccBuffer(bounds)
@@ -487,10 +487,10 @@ contains
     ! Define/write/read CLM restart file.
     !
     ! !ARGUMENTS:
-    type(bounds_type) , intent(in)    :: bounds          
-    
+    type(bounds_type) , intent(in)    :: bounds
+
     type(file_desc_t) , intent(inout) :: ncid ! netcdf id
-    character(len=*)  , intent(in)    :: flag ! 'define', 'write', 'read' 
+    character(len=*)  , intent(in)    :: flag ! 'define', 'write', 'read'
     logical           , intent(in)    :: writing_finidat_interp_dest_file ! true if we are writing a finidat_interp_dest file (ignored for flag=='read')
 
     ! Local variables
@@ -538,6 +538,8 @@ contains
     call surfalb_inst%restart (bounds, ncid, flag=flag, &
          tlai_patch=canopystate_inst%tlai_patch(bounds%begp:bounds%endp), &
          tsai_patch=canopystate_inst%tsai_patch(bounds%begp:bounds%endp))
+
+   write(iulog,*)'clm_instRest: canopystate_inst%tsai_patch: ', canopystate_inst%tsai_patch(bounds%begp:bounds%endp)
 
     call topo_inst%restart (bounds, ncid, flag=flag)
 

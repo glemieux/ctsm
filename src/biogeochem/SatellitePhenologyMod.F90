@@ -365,7 +365,7 @@ contains
          hbot               => canopystate_inst%hbot_patch    ,          & ! Output: [real(r8) (:) ] canopy bottom (m)
          frac_veg_nosno_alb => canopystate_inst%frac_veg_nosno_alb_patch & ! Output: [integer  (:) ] fraction of vegetation not covered by snow (0 OR 1) [-]
          )
-       
+
       if (use_lai_streams) then
          call lai_interp(bounds, canopystate_inst)
       endif
@@ -375,18 +375,18 @@ contains
         ! when we use FATES SP mode, the inactive points are not in the nolakep filter
         ! thus we need to force a loop around all patches to get at the SP inputs the
         ! are indexed in the HLM 'P' space.
-        nploop = bounds%endp-bounds%begp+1 
+        nploop = bounds%endp-bounds%begp+1
       else
         nploop=num_nolakep
       endif
       do fp = 1, nploop
          if(use_fates_sp)then
-          p = fp + bounds%begp -1 
+          p = fp + bounds%begp -1
         else
           p = filter_nolakep(fp)
         endif
          c = patch%column(p)
-         
+
 
          ! need to update elai and esai only every albedo time step so do not
          ! have any inconsistency in lai and sai between SurfaceAlbedo calls (i.e.,
@@ -412,6 +412,8 @@ contains
          htop(p) = timwt(1)*mhvt2t(p,1) + timwt(2)*mhvt2t(p,2)
          hbot(p) = timwt(1)*mhvb2t(p,1) + timwt(2)*mhvb2t(p,2)
 
+         write(iulog,*) 'SatellitePhenology: tsai(p): ', tsai(p)
+
          ! adjust lai and sai for burying by snow. if exposed lai and sai
          ! are less than 0.05, set equal to zero to prevent numerical
          ! problems associated with very small lai and sai.
@@ -431,9 +433,9 @@ contains
 
          ! area weight by snow covered fraction
          if(.not.use_fates_sp)then
-     
+
          ! Do not set these in FATES_SP mode as they turn on the 'vegsol' filter and also
-         ! are duplicated by the FATE variables (in the FATES IFP indexing space) 
+         ! are duplicated by the FATE variables (in the FATES IFP indexing space)
            elai(p) = max(tlai(p)*(1.0_r8 - frac_sno(c)) + tlai(p)*fb*frac_sno(c), 0.0_r8)
            esai(p) = max(tsai(p)*(1.0_r8 - frac_sno(c)) + tsai(p)*fb*frac_sno(c), 0.0_r8)
            if (elai(p) < 0.05_r8) elai(p) = 0._r8
