@@ -202,6 +202,7 @@ contains
     ! are passed to CLM in initialization, then this code block can be removed.
     ! ========================================================================
 
+    write(iulog,*) 'clm_drv: start tsai: ', canopystate_inst%tsai_patch
     write(iulog,*) 'clm_drv: start esai: ', canopystate_inst%esai_patch
 
     need_glacier_initialization = is_first_step()
@@ -247,6 +248,7 @@ contains
 
     end if
 
+    write(iulog,*) 'clm_drv: post interpMonthlyVeg tsai: ', canopystate_inst%tsai_patch
     write(iulog,*) 'clm_drv: post interpMonthlyVeg esai: ', canopystate_inst%esai_patch
 
     ! ==================================================================================
@@ -356,6 +358,7 @@ contains
          glc_behavior)
     call t_stopf('dyn_subgrid')
 
+    write(iulog,*) 'clm_drv: post-dynSubgrid tsai: ', canopystate_inst%tsai_patch
     write(iulog,*) 'clm_drv: post-dynSubgrid esai: ', canopystate_inst%esai_patch
 
     ! ============================================================================
@@ -477,6 +480,7 @@ contains
             canopystate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, &
             energyflux_inst)
+        write(iulog,*) 'clm_drv: post-clm_drv_init tsai: ', canopystate_inst%tsai_patch
         write(iulog,*) 'clm_drv: post-clm_drv_init esai: ', canopystate_inst%esai_patch
 
        call topo_inst%UpdateTopo(bounds_clump, &
@@ -587,6 +591,7 @@ contains
                                    solarabs_inst)
        end if
 
+       write(iulog,*) 'clm_drv: post sun shade tsai: ', canopystate_inst%tsai_patch
        write(iulog,*) 'clm_drv: post sun shade esai: ', canopystate_inst%esai_patch
 
        call SurfaceRadiation(bounds_clump,                                 &
@@ -597,6 +602,7 @@ contains
             canopystate_inst, surfalb_inst, &
             solarabs_inst, surfrad_inst)
 
+       write(iulog,*) 'clm_drv: post surf rad tsai: ', canopystate_inst%tsai_patch
        write(iulog,*) 'clm_drv: post surf rad esai: ', canopystate_inst%esai_patch
 
        ! Surface Radiation for only urban columns
@@ -609,6 +615,10 @@ contains
             atm2lnd_inst, water_inst%waterdiagnosticbulk_inst, &
             temperature_inst, urbanparams_inst, &
             solarabs_inst, surfalb_inst, energyflux_inst)
+
+      write(iulog,*) 'clm_drv: post UrbanRadiation tsai: ', canopystate_inst%tsai_patch
+      write(iulog,*) 'clm_drv: post UrbanRadiation esai: ', canopystate_inst%esai_patch
+
 
        call t_stopf('surfrad')
 
@@ -629,6 +639,7 @@ contains
             water_inst%wateratm2lndbulk_inst, water_inst%waterdiagnosticbulk_inst, &
             water_inst%waterstatebulk_inst)
 
+       write(iulog,*) 'clm_drv: post biogeophyspreflux tsai: ', canopystate_inst%tsai_patch
        write(iulog,*) 'clm_drv: post biogeophyspreflux esai: ', canopystate_inst%esai_patch
 
        call ozone_inst%CalcOzoneStress(bounds_clump, filter(nc)%num_exposedvegp, filter(nc)%exposedvegp)
