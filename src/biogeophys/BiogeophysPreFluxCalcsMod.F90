@@ -32,6 +32,7 @@ module BiogeophysPreFluxCalcsMod
   use WaterDiagnosticBulkType , only : waterdiagnosticbulk_type
   use WaterStateBulkType      , only : waterstatebulk_type
   use SurfaceResistanceMod    , only : calc_soilevap_resis
+  use clm_varctl              , only : iulog
   !
   ! !PUBLIC TYPES:
   implicit none
