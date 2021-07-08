@@ -449,6 +449,9 @@ contains
            else
               frac_veg_nosno_alb(p) = 0
            end if
+         else
+            write(iulog,*) 'SatellitePhenology: snow frac skipped esai(p): ', &
+            max(tsai(p)*(1.0_r8 - frac_sno(c)) + tsai(p)*fb*frac_sno(c), 0.0_r8)
          endif !fates_sp
       end do ! end of patch loop
 

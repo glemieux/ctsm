@@ -178,6 +178,8 @@ contains
     call hist_addfld1d (fname='ESAI', units='m^2/m^2', &
          avgflag='A', long_name='exposed one-sided stem area index', &
          ptr_patch=this%esai_patch)
+     write(iulog,*)'canopystate_inst%InitHistory: esai_patch: ', this%esai_patch
+
 
     this%laisun_patch(begp:endp) = spval
     call hist_addfld1d (fname='LAISUN', units='m^2/m^2', &
@@ -604,6 +606,7 @@ contains
     call restartvar(ncid=ncid, flag=flag, varname='esai', xtype=ncd_double,  &
          dim1name='pft', long_name='one-sided stem area index, with burying by snow', units='', &
          interpinic_flag='interp', readvar=readvar, data=this%esai_patch)
+     write(iulog,*)'canopystate_inst%restart: esai_patch: ', this%esai_patch
 
     call restartvar(ncid=ncid, flag=flag, varname='stem_biomass', xtype=ncd_double,  &
          dim1name='pft', long_name='stem biomass', units='kg/m^2', &

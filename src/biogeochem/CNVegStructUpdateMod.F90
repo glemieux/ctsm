@@ -332,6 +332,8 @@ contains
          elai(p) = max(tlai(p)*(1.0_r8 - frac_sno_adjusted) + tlai(p)*fb*frac_sno_adjusted, 0.0_r8)
          esai(p) = max(tsai(p)*(1.0_r8 - frac_sno_adjusted) + tsai(p)*fb*frac_sno_adjusted, 0.0_r8)
 
+         write(iulog,*) 'CNVegStructUpdate: pre-frac_veg_nosno_alb: esai(p): ', esai(p)
+
          ! Fraction of vegetation free of snow
          if ((elai(p) + esai(p)) > 0._r8) then
             frac_veg_nosno_alb(p) = 1
