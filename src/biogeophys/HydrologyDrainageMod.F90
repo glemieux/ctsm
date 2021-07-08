@@ -11,7 +11,7 @@ module HydrologyDrainageMod
   use clm_varcon        , only : denh2o, denice, rpi, spval
   use atm2lndType       , only : atm2lnd_type
   use glc2lndMod        , only : glc2lnd_type
-  use SoilHydrologyType , only : soilhydrology_type  
+  use SoilHydrologyType , only : soilhydrology_type
   use SoilStateType     , only : soilstate_type
   use TemperatureType   , only : temperature_type
   use WaterFluxBulkType     , only : waterfluxbulk_type
@@ -21,8 +21,8 @@ module HydrologyDrainageMod
   use WaterBalanceType    , only : waterbalance_type
   use GlacierSurfaceMassBalanceMod, only : glacier_smb_type
   use TotalWaterAndHeatMod, only : ComputeWaterMassNonLake
-  use LandunitType      , only : lun                
-  use ColumnType        , only : col                
+  use LandunitType      , only : lun
+  use ColumnType        , only : col
   !
   ! !PUBLIC TYPES:
   implicit none
@@ -59,14 +59,14 @@ contains
     use SoilWaterMovementMod , only : use_aquifer_layer
     !
     ! !ARGUMENTS:
-    type(bounds_type)        , intent(in)    :: bounds               
+    type(bounds_type)        , intent(in)    :: bounds
     integer                  , intent(in)    :: num_nolakec          ! number of column non-lake points in column filter
     integer                  , intent(in)    :: filter_nolakec(:)    ! column filter for non-lake points
     integer                  , intent(in)    :: num_hydrologyc       ! number of column soil points in column filter
     integer                  , intent(in)    :: filter_hydrologyc(:) ! column filter for soil points
     integer                  , intent(in)    :: num_urbanc           ! number of column urban points in column filter
     integer                  , intent(in)    :: filter_urbanc(:)     ! column filter for urban points
-    integer                  , intent(in)    :: num_do_smb_c         ! number of columns in which SMB is calculated, in column filter    
+    integer                  , intent(in)    :: num_do_smb_c         ! number of columns in which SMB is calculated, in column filter
     integer                  , intent(in)    :: filter_do_smb_c(:)   ! column filter for bare landwhere SMB is calculated
     type(atm2lnd_type)       , intent(in)    :: atm2lnd_inst
     type(glc2lnd_type)       , intent(in)    :: glc2lnd_inst
@@ -85,38 +85,38 @@ contains
     real(r8) :: dtime                      ! land model time step (sec)
     !-----------------------------------------------------------------------
 
-    associate(                                                            & ! Input: layer thickness depth (m)  
+    associate(                                                            & ! Input: layer thickness depth (m)
          dz                 => col%dz                                    , & ! Input: column type
-         ctype              => col%itype                                 , & ! Input: gridcell flux of flood water from RTM            
-         qflx_floodg        => wateratm2lndbulk_inst%forc_flood_grc      , & ! Input: rain rate [mm/s]   
+         ctype              => col%itype                                 , & ! Input: gridcell flux of flood water from RTM
+         qflx_floodg        => wateratm2lndbulk_inst%forc_flood_grc      , & ! Input: rain rate [mm/s]
          forc_rain          => wateratm2lndbulk_inst%forc_rain_downscaled_col , & ! Input: snow rate [mm/s]
-         forc_snow          => wateratm2lndbulk_inst%forc_snow_downscaled_col , & ! Input: water mass begining of the time step     
-         begwb              => waterbalancebulk_inst%begwb_col           , & ! Output:water mass end of the time step 
-         endwb              => waterbalancebulk_inst%endwb_col           , & ! Output:water mass end of the time step     
-         h2osoi_ice         => waterstatebulk_inst%h2osoi_ice_col        , & ! Output: ice lens (kg/m2)      
-         h2osoi_liq         => waterstatebulk_inst%h2osoi_liq_col        , & ! Output: liquid water (kg/m2) 
-         h2osoi_vol         => waterstatebulk_inst%h2osoi_vol_col        , & ! Output: volumetric soil water 
+         forc_snow          => wateratm2lndbulk_inst%forc_snow_downscaled_col , & ! Input: water mass begining of the time step
+         begwb              => waterbalancebulk_inst%begwb_col           , & ! Output:water mass end of the time step
+         endwb              => waterbalancebulk_inst%endwb_col           , & ! Output:water mass end of the time step
+         h2osoi_ice         => waterstatebulk_inst%h2osoi_ice_col        , & ! Output: ice lens (kg/m2)
+         h2osoi_liq         => waterstatebulk_inst%h2osoi_liq_col        , & ! Output: liquid water (kg/m2)
+         h2osoi_vol         => waterstatebulk_inst%h2osoi_vol_col        , & ! Output: volumetric soil water
                                                                          ! (0<=h2osoi_vol<=watsat) [m3/m3]
-         qflx_evap_tot      => waterfluxbulk_inst%qflx_evap_tot_col      , & ! Input: qflx_evap_soi + qflx_evap_can + qflx_tran_veg     
-         qflx_snwcp_ice     => waterfluxbulk_inst%qflx_snwcp_ice_col     , & ! Input: excess solid h2o due to snow 
+         qflx_evap_tot      => waterfluxbulk_inst%qflx_evap_tot_col      , & ! Input: qflx_evap_soi + qflx_evap_can + qflx_tran_veg
+         qflx_snwcp_ice     => waterfluxbulk_inst%qflx_snwcp_ice_col     , & ! Input: excess solid h2o due to snow
                                                                          ! capping (outgoing) (mm H2O /s) [+]
-         qflx_snwcp_discarded_ice => waterfluxbulk_inst%qflx_snwcp_discarded_ice_col, & ! excess solid h2o due to snow capping, 
+         qflx_snwcp_discarded_ice => waterfluxbulk_inst%qflx_snwcp_discarded_ice_col, & ! excess solid h2o due to snow capping,
                                                                                     ! which we simply discard in order to reset
                                                                                     ! the snow pack (mm H2O /s) [+]
-         qflx_snwcp_discarded_liq => waterfluxbulk_inst%qflx_snwcp_discarded_liq_col, & ! excess liquid h2o due to snow capping, 
+         qflx_snwcp_discarded_liq => waterfluxbulk_inst%qflx_snwcp_discarded_liq_col, & ! excess liquid h2o due to snow capping,
                                                                                     ! which we simply discard in order to reset
                                                                                     ! the snow pack (mm H2O /s) [+]
          qflx_drain_perched => waterfluxbulk_inst%qflx_drain_perched_col , & ! sub-surface runoff from perched zwt (mm H2O /s)
-         qflx_rsub_sat      => waterfluxbulk_inst%qflx_rsub_sat_col      , & ! soil saturation excess [mm h2o/s]  
-         qflx_drain         => waterfluxbulk_inst%qflx_drain_col         , & ! sub-surface runoff (mm H2O /s) 
-         qflx_surf          => waterfluxbulk_inst%qflx_surf_col          , & ! surface runoff (mm H2O /s)      
-         qflx_infl          => waterfluxbulk_inst%qflx_infl_col          , & ! infiltration (mm H2O /s)   
+         qflx_rsub_sat      => waterfluxbulk_inst%qflx_rsub_sat_col      , & ! soil saturation excess [mm h2o/s]
+         qflx_drain         => waterfluxbulk_inst%qflx_drain_col         , & ! sub-surface runoff (mm H2O /s)
+         qflx_surf          => waterfluxbulk_inst%qflx_surf_col          , & ! surface runoff (mm H2O /s)
+         qflx_infl          => waterfluxbulk_inst%qflx_infl_col          , & ! infiltration (mm H2O /s)
          qflx_qrgwl         => waterfluxbulk_inst%qflx_qrgwl_col         , & ! qflx_surf at glaciers, wetlands, lakes
          qflx_runoff        => waterfluxbulk_inst%qflx_runoff_col        , & ! total runoff (qflx_drain+qflx_surf+qflx_qrgwl) (mm H2O /s)
          qflx_runoff_u      => waterfluxbulk_inst%qflx_runoff_u_col      , & ! Urban total runoff (qflx_drain+qflx_surf) (mm H2O /s)
          qflx_runoff_r      => waterfluxbulk_inst%qflx_runoff_r_col      , & ! Rural total runoff (qflx_drain+qflx_surf+qflx_qrgwl) (mm H2O /s)
          qflx_ice_runoff_snwcp => waterfluxbulk_inst%qflx_ice_runoff_snwcp_col, &  ! solid runoff from snow capping (mm H2O /s)
-         qflx_sfc_irrig     => waterfluxbulk_inst%qflx_sfc_irrig_col       & ! surface irrigation flux (mm H2O /s)   
+         qflx_sfc_irrig     => waterfluxbulk_inst%qflx_sfc_irrig_col       & ! surface irrigation flux (mm H2O /s)
          )
 
       ! Determine time step and step size
@@ -128,19 +128,19 @@ contains
               soilhydrology_inst, waterstatebulk_inst)
       endif
 
-      if (use_aquifer_layer()) then 
+      if (use_aquifer_layer()) then
          call Drainage(bounds, num_hydrologyc, filter_hydrologyc, &
               num_urbanc, filter_urbanc,&
               temperature_inst, soilhydrology_inst, soilstate_inst, &
               waterstatebulk_inst, waterfluxbulk_inst)
       else
-         
+
          call PerchedLateralFlow(bounds, num_hydrologyc, filter_hydrologyc, &
               num_urbanc, filter_urbanc,&
               soilhydrology_inst, soilstate_inst, &
               waterstatebulk_inst, waterfluxbulk_inst)
 
-         
+
          call LateralFlowPowerLaw(bounds, num_hydrologyc, filter_hydrologyc, &
               num_urbanc, filter_urbanc,&
               soilhydrology_inst, soilstate_inst, &
@@ -157,6 +157,7 @@ contains
             end if
          end do
       end do
+      write(iulog,*) 'HydrologyDrainage: nlevgrnd: h2osoi_vol: ', h2osoi_vol
 
       do j = 1, nlevurb
          do fc = 1, num_urbanc
@@ -167,6 +168,7 @@ contains
             end if
          end do
       end do
+      write(iulog,*) 'HydrologyDrainage: nlevurb: h2osoi_vol: ', h2osoi_vol
 
       call ComputeWaterMassNonLake(bounds, num_nolakec, filter_nolakec, &
            waterstatebulk_inst, waterdiagnosticbulk_inst, &

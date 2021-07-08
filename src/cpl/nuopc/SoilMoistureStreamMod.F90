@@ -30,7 +30,7 @@ module SoilMoistureStreamMod
   use clm_varctl         , only : iulog, use_soil_moisture_streams
   use controlMod         , only : NLFilename
   use LandunitType       , only : lun
-  use ColumnType         , only : col                
+  use ColumnType         , only : col
   use SoilStateType      , only : soilstate_type
   use WaterStateBulkType , only : waterstatebulk_type
   use perf_mod           , only : t_startf, t_stopf
@@ -57,7 +57,7 @@ module SoilMoistureStreamMod
   character(len=CL)       :: stream_lev_dimname = 'levsoi' ! name of vertical layer dimension
   integer, allocatable    :: g_to_ig(:)                    ! Array matching gridcell index to data index
   logical                 :: soilm_ignore_data_if_missing  ! If should ignore overridding a point with soil moisture data
-                                                           ! from the streams file, if the streams file shows that point 
+                                                           ! from the streams file, if the streams file shows that point
                                                            ! as missing (namelist item)
   ! !PRIVATE TYPES:
   character(len=*), parameter, private :: sourcefile = &
@@ -67,7 +67,7 @@ module SoilMoistureStreamMod
   !-----------------------------------------------------------------------
 
 contains
-  
+
   !-----------------------------------------------------------------------
   !
   ! soil_moisture_init
@@ -88,7 +88,7 @@ contains
     integer            :: i                          ! index
     integer            :: stream_year_first_soilm    ! first year in Ustar stream to use
     integer            :: stream_year_last_soilm     ! last year in Ustar stream to use
-    integer            :: model_year_align_soilm     ! align stream_year_first_soilm with 
+    integer            :: model_year_align_soilm     ! align stream_year_first_soilm with
     integer            :: nu_nml                     ! unit for namelist file
     integer            :: nml_error                  ! namelist i/o error flag
     integer            :: soilm_offset               ! Offset in time for dataset (sec)
@@ -146,9 +146,9 @@ contains
     if (masterproc) then
        write(iulog,*) ' '
        write(iulog,*) 'soil_moisture_stream settings:'
-       write(iulog,*) '  stream_year_first_soilm  = ',stream_year_first_soilm  
-       write(iulog,*) '  stream_year_last_soilm   = ',stream_year_last_soilm   
-       write(iulog,*) '  model_year_align_soilm   = ',model_year_align_soilm   
+       write(iulog,*) '  stream_year_first_soilm  = ',stream_year_first_soilm
+       write(iulog,*) '  stream_year_last_soilm   = ',stream_year_last_soilm
+       write(iulog,*) '  model_year_align_soilm   = ',model_year_align_soilm
        write(iulog,*) '  stream_fldfilename_soilm = ',trim(stream_fldfilename_soilm)
        write(iulog,*) '  soilm_tintalgo           = ',trim(soilm_tintalgo)
        write(iulog,*) '  soilm_offset             = ',soilm_offset
@@ -170,7 +170,7 @@ contains
          model_clock         = model_clock,                        &
          model_mesh          = mesh,                               &
          stream_meshfile     = model_meshfile,                     &
-         stream_lev_dimname  = trim(stream_lev_dimname),           & 
+         stream_lev_dimname  = trim(stream_lev_dimname),           &
          stream_mapalgo      = trim(stream_mapalgo),               &
          stream_filenames    = (/trim(stream_fldfilename_soilm)/), &
          stream_fldlistFile  = (/trim(stream_var_name)/),          &
@@ -278,7 +278,7 @@ contains
     SHR_ASSERT_FL( (lbound(g_to_ig,1) <= bounds%begg ), sourcefile, __LINE__)
     SHR_ASSERT_FL( (ubound(g_to_ig,1) >= bounds%endg ), sourcefile, __LINE__)
     associate( &
-         dz               =>    col%dz                             ,   & ! Input:  [real(r8) (:,:) ]  layer depth (m)                                 
+         dz               =>    col%dz                             ,   & ! Input:  [real(r8) (:,:) ]  layer depth (m)
          watsat           =>    soilstate_inst%watsat_col          ,   & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)
          h2osoi_liq       =>    waterstatebulk_inst%h2osoi_liq_col ,   & ! Input/Output:  [real(r8) (:,:) ]  liquid water (kg/m2)
          h2osoi_ice       =>    waterstatebulk_inst%h2osoi_ice_col ,   & ! Input/Output:  [real(r8) (:,:) ]  ice water (kg/m2)
@@ -339,12 +339,12 @@ contains
              end if
          end do
       end do
-      
+
       do c = bounds%begc, bounds%endc
          ! Set variable for each gridcell/column combination
          g = col%gridcell(c)
          ig = g_to_ig(g)
-            
+
          ! EBK Jan/2020, also check weights on gridcell (See https://github.com/ESCOMP/CTSM/issues/847)
          if ( (lun%itype(col%landunit(c)) == istsoil) .or. &
               (lun%itype(col%landunit(c)) == istcrop) .and. (col%wtgcell(c) /= 0._r8) ) then
@@ -353,10 +353,10 @@ contains
             do j = 1, nlevsoi
                ! if soil water is zero, liq/ice fractions cannot be calculated
                if((h2osoi_liq(c, j) + h2osoi_ice(c, j)) > 0._r8) then
-                  
+
                   ! save original soil moisture value
                   h2osoi_vol_initial = h2osoi_vol(c,j)
-            
+
                   ! Check if the vegetated land mask from the dataset on the
                   ! file is different
                   if ( (h2osoi_vol_prs(g,j) == spval) .and. (h2osoi_vol_initial /= spval) )then
@@ -390,8 +390,10 @@ contains
                   call endrun(subname // ':: ERROR h2osoil liquid plus ice is zero')
                endif
             enddo
-         endif      
+         endif
       end do
+
+      write(iulog,*) 'PrescribedSoilMoistureInterp: h2osoi_vol: ', h2osoi_vol
 
     end associate
 

@@ -415,6 +415,7 @@ contains
          endif
       end do
 
+      write(iulog,*) 'PrescribedSoilMoistureInterp: h2osoi_vol', h2osoi_vol
     end associate
 
   end subroutine PrescribedSoilMoistureInterp

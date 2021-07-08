@@ -9,13 +9,13 @@ module SoilWaterMovementMod
   ! created by Jinyun Tang, Mar 12, 2014
   use shr_kind_mod      , only : r8 => shr_kind_r8
   use shr_sys_mod       , only : shr_sys_flush
- 
+
   !
   implicit none
   private
   !
   ! !PUBLIC MEMBER FUNCTIONS:
-  public :: SoilWater            ! Calculate soil hydrology   
+  public :: SoilWater            ! Calculate soil hydrology
   public :: init_soilwater_movement
   public :: readParams
   private :: soilwater_zengdecker2009
@@ -45,7 +45,7 @@ module SoilWaterMovementMod
 
   ! !PRIVATE DATA MEMBERS:
 
-  ! Solution method 
+  ! Solution method
   integer, parameter :: zengdecker_2009 = 0
   integer, parameter :: moisture_form = 1
   integer, parameter :: mixed_form = 2
@@ -113,7 +113,7 @@ contains
     !specify method for doing soil&root water interactions
     !
     ! !USES:
-    use abortutils      , only : endrun   
+    use abortutils      , only : endrun
     use fileutils       , only : getavu, relavu
     use spmdMod         , only : mpicom, masterproc
     use shr_mpi_mod     , only : shr_mpi_bcast
@@ -149,13 +149,13 @@ contains
     upper_boundary_condition = bc_flux
     lower_boundary_condition = bc_aquifer
 
-    dtmin=60._r8          
-    verySmall=1.e-8_r8    
-    xTolerUpper=1.e-1_r8  
-    xTolerLower=1.e-2_r8  
+    dtmin=60._r8
+    verySmall=1.e-8_r8
+    xTolerUpper=1.e-1_r8
+    xTolerLower=1.e-2_r8
     expensive=42
     inexpensive=1
-    flux_calculation=inexpensive  
+    flux_calculation=inexpensive
 
     ! Read soilwater_movement namelist
     if (masterproc) then
@@ -214,14 +214,14 @@ contains
     endif
 
   end subroutine init_soilwater_movement
-  
+
 
 !#3
-   !------------------------------------------------------------------------------   
+   !------------------------------------------------------------------------------
    function use_aquifer_layer() result(lres)
      !
      !DESCRIPTION
-     ! return true if an aquifer layer is used 
+     ! return true if an aquifer layer is used
      ! otherwise false
      implicit none
      logical :: lres
@@ -248,8 +248,8 @@ contains
     !USES
     use shr_kind_mod      , only : r8 => shr_kind_r8
     use clm_varpar        , only : nlevsoi
-    use decompMod         , only : bounds_type   
-    use abortutils        , only : endrun   
+    use decompMod         , only : bounds_type
+    use abortutils        , only : endrun
     use clm_varpar        , only : nlevsoi
     use SoilHydrologyType , only : soilhydrology_type
     use SoilStateType     , only : soilstate_type
@@ -261,7 +261,7 @@ contains
     use ColumnType        , only : col
     use SoilWaterRetentionCurveMod, only : soil_water_retention_curve_type
     use clm_varcon        , only : denh2o, denice
-    use clm_varctl,  only : use_flexibleCN   
+    use clm_varctl,  only : use_flexibleCN
     use clm_varctl      , only : iulog
     !
     ! !ARGUMENTS:
@@ -284,16 +284,16 @@ contains
     real(r8) :: xs(bounds%begc:bounds%endc)                !excess soil water above urban ponding limit
     real(r8) :: watmin
     integer  :: fc, c, j
-    
+
     !------------------------------------------------------------------------------
 
     associate(                                                         &
       wa                 =>    waterstatebulk_inst%wa_col             , & ! Input:  [real(r8) (:)   ] water in the unconfined aquifer (mm)
-      dz                 =>    col%dz                                , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)    
+      dz                 =>    col%dz                                , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)
       h2osoi_ice         =>    waterstatebulk_inst%h2osoi_ice_col        , & ! Output: [real(r8) (:,:) ] liquid water (kg/m2)
       h2osoi_vol         =>    waterstatebulk_inst%h2osoi_vol_col        , & ! Output: [real(r8) (:,:) ] liquid water (kg/m2)
       h2osoi_liq         =>    waterstatebulk_inst%h2osoi_liq_col          & ! Output: [real(r8) (:,:) ] liquid water (kg/m2)
-    )      
+    )
 
     write(iulog,*) 'SoilWater: soilwater_movement_method: ', soilwater_movement_method
     select case(soilwater_movement_method)
@@ -326,7 +326,7 @@ contains
 
     case default
 
-       call endrun(subname // ':: a SoilWater implementation must be specified!')          
+       call endrun(subname // ':: a SoilWater implementation must be specified!')
 
     end select
 
@@ -334,7 +334,7 @@ contains
     if (use_flexibleCN) then
        !a work around of the negative liquid water. Jinyun Tang, Jan 14, 2015
        watmin = 0.001_r8
-       
+
        do j = 1, nlevsoi-1
           do fc = 1, num_hydrologyc
              c = filter_hydrologyc(fc)
@@ -347,7 +347,7 @@ contains
              h2osoi_liq(c,j+1) = h2osoi_liq(c,j+1) - xs(c)
           end do
        end do
-       
+
        j = nlevsoi
        do fc = 1, num_hydrologyc
           c = filter_hydrologyc(fc)
@@ -359,7 +359,7 @@ contains
           h2osoi_liq(c,j) = h2osoi_liq(c,j) + xs(c)
           wa(c) = wa(c) - xs(c)
        end do
-       
+
        !update volumetric soil moisture for bgc calculation
        do j = 1, nlevsoi
           do fc = 1, num_hydrologyc
@@ -369,16 +369,19 @@ contains
           enddo
        enddo
     end if
-   end associate 
+
+    write(iulog,*), 'SoilWater: h2osoi_vol', h2osoi_vol
+
+   end associate
   end subroutine SoilWater
 
 !#5
-  !-----------------------------------------------------------------------   
+  !-----------------------------------------------------------------------
   subroutine BaseflowSink(bounds, num_hydrologyc, &
        filter_hydrologyc, baseflow_sink, waterfluxbulk_inst, soilstate_inst)
     !
     ! Generic routine to apply baseflow as a sink condition that
-    ! is vertically distributed over the soil column. 
+    ! is vertically distributed over the soil column.
     !
     !USES:
     use decompMod        , only : bounds_type
@@ -401,7 +404,7 @@ contains
     integer  :: p,c,fc,j                                              ! do loop indices
     integer  :: pi                                                    ! patch index
     real(r8) :: temp(bounds%begc:bounds%endc)                         ! accumulator for rootr weighting
-    !-----------------------------------------------------------------------   
+    !-----------------------------------------------------------------------
 
     ! Enforce expected array sizes
     SHR_ASSERT_ALL_FL((ubound(baseflow_sink)  == (/bounds%endc, nlevsoi/)), sourcefile, __LINE__)
@@ -482,9 +485,9 @@ contains
     ! r_j = a_j [d wat_j-1] + b_j [d wat_j] + c_j [d wat_j+1]
     !
     ! !USES:
-    use shr_kind_mod               , only : r8 => shr_kind_r8     
+    use shr_kind_mod               , only : r8 => shr_kind_r8
     use shr_const_mod              , only : SHR_CONST_TKFRZ, SHR_CONST_LATICE, SHR_CONST_G
-    use decompMod                  , only : bounds_type        
+    use decompMod                  , only : bounds_type
     use clm_varcon                 , only : grav,hfus,tfrz
     use clm_varcon                 , only : denh2o, denice
     use clm_varpar                 , only : nlevsoi, max_patch_per_col, nlevgrnd
@@ -492,7 +495,7 @@ contains
     use column_varcon              , only : icol_roof, icol_road_imperv
     use clm_varctl                 , only : use_flexibleCN, use_hydrstress
     use TridiagonalMod             , only : Tridiagonal
-    use abortutils                 , only : endrun     
+    use abortutils                 , only : endrun
     use SoilStateType              , only : soilstate_type
     use SoilHydrologyType          , only : soilhydrology_type
     use TemperatureType            , only : temperature_type
@@ -522,7 +525,7 @@ contains
     class(soil_water_retention_curve_type), intent(in) :: soil_water_retention_curve
     !
     ! !LOCAL VARIABLES:
-    character(len=32) :: subname = 'soilwater_zengdecker2009' ! subroutine name 
+    character(len=32) :: subname = 'soilwater_zengdecker2009' ! subroutine name
     integer  :: p,c,fc,j                                     ! do loop indices
     integer  :: jtop(bounds%begc:bounds%endc)                ! top level at each column
     real(r8) :: dtime                                        ! land model time step (sec)
@@ -561,7 +564,7 @@ contains
     real(r8) :: temp0                                        ! temp variable for calculating vol_eq
     real(r8) :: voleq1                                       ! temp variable for calculating vol_eq
     real(r8) :: zwtmm(bounds%begc:bounds%endc)               ! water table depth [mm]
-    real(r8) :: imped(bounds%begc:bounds%endc,1:nlevsoi)             
+    real(r8) :: imped(bounds%begc:bounds%endc,1:nlevsoi)
     real(r8) :: vol_ice(bounds%begc:bounds%endc,1:nlevsoi)
     real(r8) :: z_mid
     real(r8) :: vwc_zwt(bounds%begc:bounds%endc)
@@ -573,41 +576,41 @@ contains
     integer :: nstep
     !-----------------------------------------------------------------------
 
-    associate(& 
-         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)                                 
-         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  interface level below a "z" level (m)           
-         dz                =>    col%dz                             , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)                             
+    associate(&
+         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)
+         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  interface level below a "z" level (m)
+         dz                =>    col%dz                             , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)
 
          origflag          =>    soilhydrology_inst%origflag        , & ! Input:  constant
-         qcharge           =>    soilhydrology_inst%qcharge_col     , & ! Input:  [real(r8) (:)   ]  aquifer recharge rate (mm/s)                      
-         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)                             
-         fracice           =>    soilhydrology_inst%fracice_col     , & ! Input:  [real(r8) (:,:) ]  fractional impermeability (-)                   
-         icefrac           =>    soilhydrology_inst%icefrac_col     , & ! Input:  [real(r8) (:,:) ]  fraction of ice                                 
-         hkdepth           =>    soilhydrology_inst%hkdepth_col     , & ! Input:  [real(r8) (:)   ]  decay factor (m)                                  
+         qcharge           =>    soilhydrology_inst%qcharge_col     , & ! Input:  [real(r8) (:)   ]  aquifer recharge rate (mm/s)
+         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)
+         fracice           =>    soilhydrology_inst%fracice_col     , & ! Input:  [real(r8) (:,:) ]  fractional impermeability (-)
+         icefrac           =>    soilhydrology_inst%icefrac_col     , & ! Input:  [real(r8) (:,:) ]  fraction of ice
+         hkdepth           =>    soilhydrology_inst%hkdepth_col     , & ! Input:  [real(r8) (:)   ]  decay factor (m)
 
-         smpmin            =>    soilstate_inst%smpmin_col          , & ! Input:  [real(r8) (:)   ]  restriction for min of soil potential (mm)        
-         watsat            =>    soilstate_inst%watsat_col          , & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)  
+         smpmin            =>    soilstate_inst%smpmin_col          , & ! Input:  [real(r8) (:)   ]  restriction for min of soil potential (mm)
+         watsat            =>    soilstate_inst%watsat_col          , & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)
          hksat             =>    soilstate_inst%hksat_col           , & ! Input:  [real(r8) (:,:) ]  hydraulic conductivity at saturation (mm H2O /s)
-         bsw               =>    soilstate_inst%bsw_col             , & ! Input:  [real(r8) (:,:) ]  Clapp and Hornberger "b"                        
-         sucsat            =>    soilstate_inst%sucsat_col          , & ! Input:  [real(r8) (:,:) ]  minimum soil suction (mm)                       
-         eff_porosity      =>    soilstate_inst%eff_porosity_col    , & ! Input:  [real(r8) (:,:) ]  effective porosity = porosity - vol_ice         
-         smp_l             =>    soilstate_inst%smp_l_col           , & ! Input:  [real(r8) (:,:) ]  soil matrix potential [mm]                      
-         hk_l              =>    soilstate_inst%hk_l_col            , & ! Input:  [real(r8) (:,:) ]  hydraulic conductivity (mm/s)                   
+         bsw               =>    soilstate_inst%bsw_col             , & ! Input:  [real(r8) (:,:) ]  Clapp and Hornberger "b"
+         sucsat            =>    soilstate_inst%sucsat_col          , & ! Input:  [real(r8) (:,:) ]  minimum soil suction (mm)
+         eff_porosity      =>    soilstate_inst%eff_porosity_col    , & ! Input:  [real(r8) (:,:) ]  effective porosity = porosity - vol_ice
+         smp_l             =>    soilstate_inst%smp_l_col           , & ! Input:  [real(r8) (:,:) ]  soil matrix potential [mm]
+         hk_l              =>    soilstate_inst%hk_l_col            , & ! Input:  [real(r8) (:,:) ]  hydraulic conductivity (mm/s)
 
-         h2osoi_ice        =>    waterstatebulk_inst%h2osoi_ice_col     , & ! Input:  [real(r8) (:,:) ]  ice water (kg/m2)                               
-         h2osoi_liq        =>    waterstatebulk_inst%h2osoi_liq_col     , & ! Input:  [real(r8) (:,:) ]  liquid water (kg/m2)                            
+         h2osoi_ice        =>    waterstatebulk_inst%h2osoi_ice_col     , & ! Input:  [real(r8) (:,:) ]  ice water (kg/m2)
+         h2osoi_liq        =>    waterstatebulk_inst%h2osoi_liq_col     , & ! Input:  [real(r8) (:,:) ]  liquid water (kg/m2)
          h2osoi_vol        =>    waterstatebulk_inst%h2osoi_vol_col     , & ! Input:  [real(r8) (:,:) ]  volumetric soil water (0<=h2osoi_vol<=watsat) [m3/m3]
 
          qflx_deficit      =>    waterfluxbulk_inst%qflx_deficit_col    , & ! Input:  [real(r8) (:)   ]  water deficit to keep non-negative liquid water content
-         qflx_infl         =>    waterfluxbulk_inst%qflx_infl_col       , & ! Input:  [real(r8) (:)   ]  infiltration (mm H2O /s)                          
+         qflx_infl         =>    waterfluxbulk_inst%qflx_infl_col       , & ! Input:  [real(r8) (:)   ]  infiltration (mm H2O /s)
 
          qflx_rootsoi_col  =>    waterfluxbulk_inst%qflx_rootsoi_col    , & ! Output: [real(r8) (:,:) ]  vegetation/soil water exchange (mm H2O/s) (+ = to atm)
          qflx_drain_vr_col =>    waterfluxbulk_inst%qflx_drain_vr_col   , & ! Input:  [real(r8) (:,:) ]  drainage from soil layers due to plant induced
-         t_soisno          =>    temperature_inst%t_soisno_col        & ! Input:  [real(r8) (:,:) ]  soil temperature (Kelvin)                       
+         t_soisno          =>    temperature_inst%t_soisno_col        & ! Input:  [real(r8) (:,:) ]  soil temperature (Kelvin)
          )
 
       ! Get time step
-      
+
       nstep = get_nstep()
       dtime = get_step_size_real()
 
@@ -629,7 +632,7 @@ contains
          end do
       end do
 
-      do fc = 1, num_hydrologyc 
+      do fc = 1, num_hydrologyc
          c = filter_hydrologyc(fc)
          zimm(c,0) = 0.0_r8
          zwtmm(c)  = zwt(c)*1.e3_r8
@@ -661,7 +664,7 @@ contains
                   !smp1 = max(0._r8,smp1)
                   smp1 = max(sucsat(c,nlevsoi),smp1)
                   vwc_zwt(c) = watsat(c,nlevsoi)*(smp1/sucsat(c,nlevsoi))**(-1._r8/bsw(c,nlevsoi))
-                  ! for temperatures close to tfrz, limit vwc to total water content 
+                  ! for temperatures close to tfrz, limit vwc to total water content
                   vwc_zwt(c) = min(vwc_zwt(c), 0.5*(watsat(c,nlevsoi) + h2osoi_vol(c,nlevsoi)) )
                   exit
                endif
@@ -671,10 +674,10 @@ contains
 
       ! calculate the equilibrium water content based on the water table depth
 
-      do j=1,nlevsoi 
+      do j=1,nlevsoi
          do fc=1, num_hydrologyc
             c = filter_hydrologyc(fc)
-            if ((zwtmm(c) <= zimm(c,j-1))) then 
+            if ((zwtmm(c) <= zimm(c,j-1))) then
                vol_eq(c,j) = watsat(c,j)
 
                ! use the weighted average from the saturated part (depth > wtd) and the equilibrium solution for the
@@ -704,7 +707,7 @@ contains
       j = nlevsoi
       do fc=1, num_hydrologyc
          c = filter_hydrologyc(fc)
-         if(jwt(c) == nlevsoi) then 
+         if(jwt(c) == nlevsoi) then
             tempi = 1._r8
             temp0 = (((sucsat(c,j)+zwtmm(c)-zimm(c,j))/sucsat(c,j)))**(1._r8-1._r8/bsw(c,j))
             vol_eq(c,j+1) = -sucsat(c,j)*watsat(c,j)/(1._r8-1._r8/bsw(c,j))/(zwtmm(c)-zimm(c,j))*(tempi-temp0)
@@ -747,9 +750,9 @@ contains
             !call soil_water_retention_curve%soil_hk(hksat(c,j), imped(c,j), s1, bsw(c,j), hktmp, dhkds)
             !if(hktmp/=hk(c,j))write(10,*)'diff',hktmp,hk(c,j)
             !    call endrun('bad in hk')
-            !endif    
+            !endif
             !apply ice impedance
-            !hk(c,j) = imped(c,j)*hk(c,j)          
+            !hk(c,j) = imped(c,j)*hk(c,j)
             !dhkdw(c,j) = imped(c,j) * dhkds * (1._r8/(watsat(c,j)+watsat(c,min(nlevsoi, j+1))))
 
 
@@ -768,7 +771,7 @@ contains
             !do not turn on the line below, which will cause bit to bit error, jyt, 2014 Mar 6
             !dsmpdw(c,j) = dsmpds/watsat(c,j)
 
-            if (origflag == 1) then             
+            if (origflag == 1) then
                dsmpdw(c,j) = -bsw(c,j)*smp(c,j)/(s_node*watsat(c,j))
             else
                dsmpdw(c,j) = -bsw(c,j)*smp(c,j)/vwc_liq(c,j)
@@ -809,7 +812,7 @@ contains
          amx(c,j) =  0._r8
          bmx(c,j) =  dzmm(c,j)*(sdamp+1._r8/dtime) + dqodw1(c,j)
          cmx(c,j) =  dqodw2(c,j)
-         
+
       end do
 
       ! Nodes j=2 to j=nlevsoi-1
@@ -833,7 +836,7 @@ contains
             amx(c,j)    = -dqidw0(c,j)
             bmx(c,j)    =  dzmm(c,j)/dtime - dqidw1(c,j) + dqodw1(c,j)
             cmx(c,j)    =  dqodw2(c,j)
-            
+
          end do
       end do
 
@@ -951,7 +954,7 @@ contains
             !is not bit for bit
             !call soil_water_retention_curve%soil_hk(hksat(c,jwt(c)+1), s1, bsw(c,jwt(c)+1), ka)
             !apply ice impedance
-            !ka = imped(c,jwt(c)+1) * ka 
+            !ka = imped(c,jwt(c)+1) * ka
             ! Recharge rate qcharge to groundwater (positive to aquifer)
             smp1 = max(smpmin(c), smp(c,max(1,jwt(c))))
             wh      = smp1 - zq(c,max(1,jwt(c)))
@@ -986,8 +989,8 @@ contains
          enddo
       enddo
 
-    end associate 
-         
+    end associate
+
   end subroutine soilwater_zengdecker2009
 
 !#7
@@ -1135,7 +1138,7 @@ contains
     real(r8) :: dUpp(1:nlevsoi-1)                            ! upper diagonal vector
     real(r8) :: diag(1:nlevsoi)                              ! diagonal vector
     integer  :: err                                          ! error code from the lapack routines
-    character(len=32) :: subname = 'soilwater_moisture_form' ! subroutine name   
+    character(len=32) :: subname = 'soilwater_moisture_form' ! subroutine name
     integer,parameter :: soil_hydraulic_properties_method = 0 ! 0 for CH78
     integer,parameter :: ice_impedance_method = 1            ! 1 for power form
     integer,parameter :: lapack=1
@@ -1170,21 +1173,21 @@ contains
     !-----------------------------------------------------------------------
 
     associate(&
-         nbedrock          =>    col%nbedrock                       , & ! Input:  [real(r8) (:,:) ]  depth to bedrock (m)                                 
-         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)                                 
-         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  interface level below a "z" level (m)           
-         dz                =>    col%dz                             , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)                             
+         nbedrock          =>    col%nbedrock                       , & ! Input:  [real(r8) (:,:) ]  depth to bedrock (m)
+         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)
+         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  interface level below a "z" level (m)
+         dz                =>    col%dz                             , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)
 
          nsubsteps         =>    soilhydrology_inst%num_substeps_col, & ! Input:  [real(r8) (:)   ]  adaptive timestep counter
 
-         qcharge           =>    soilhydrology_inst%qcharge_col     , & ! Input:  [real(r8) (:)   ]  aquifer recharge rate (mm/s)                      
-         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)                             
+         qcharge           =>    soilhydrology_inst%qcharge_col     , & ! Input:  [real(r8) (:)   ]  aquifer recharge rate (mm/s)
+         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)
 
-         smp_l             =>    soilstate_inst%smp_l_col           , & ! Input:  [real(r8) (:,:) ]  soil matrix potential [mm]                      
-         hk_l              =>    soilstate_inst%hk_l_col            , & ! Input:  [real(r8) (:,:) ]  hydraulic conductivity (mm/s)                   
-         h2osoi_ice        =>    waterstatebulk_inst%h2osoi_ice_col , & ! Input:  [real(r8) (:,:) ]  ice water (kg/m2)                               
-         h2osoi_liq        =>    waterstatebulk_inst%h2osoi_liq_col , & ! Input:  [real(r8) (:,:) ]  liquid water (kg/m2)                            
-         qflx_rootsoi_col  =>    waterfluxbulk_inst%qflx_rootsoi_col  &   
+         smp_l             =>    soilstate_inst%smp_l_col           , & ! Input:  [real(r8) (:,:) ]  soil matrix potential [mm]
+         hk_l              =>    soilstate_inst%hk_l_col            , & ! Input:  [real(r8) (:,:) ]  hydraulic conductivity (mm/s)
+         h2osoi_ice        =>    waterstatebulk_inst%h2osoi_ice_col , & ! Input:  [real(r8) (:,:) ]  ice water (kg/m2)
+         h2osoi_liq        =>    waterstatebulk_inst%h2osoi_liq_col , & ! Input:  [real(r8) (:,:) ]  liquid water (kg/m2)
+         qflx_rootsoi_col  =>    waterfluxbulk_inst%qflx_rootsoi_col  &
          )  ! end associate statement
 
       ! Get time step
@@ -1251,7 +1254,7 @@ contains
 
             write(iulog,*) 'soilwater_moisture_form:  pre-compute_RHS qflx_rootsoi_col: ', qflx_rootsoi_col(c,1:nlayers)
             ! RHS of system of equations
-            call compute_RHS_moisture_form(c, nlayers, &           
+            call compute_RHS_moisture_form(c, nlayers, &
                  qflx_rootsoi_col(c,1:nlayers), &
                  vwc_liq(c,1:nlayers), &
                  qin(c,1:nlayers), &
@@ -1259,7 +1262,7 @@ contains
                  dt_dz(c,1:nlayers), &
                  rmx(c,1:nlayers))
             write(iulog,*) 'soilwater_moisture_form:  port-compute_RHS qflx_rootsoi_col: ', qflx_rootsoi_col(c,1:nlayers)
-            
+
             ! LHS of system of equations
             call compute_LHS_moisture_form(c, nlayers, &
                  soilhydrology_inst, &
@@ -1346,7 +1349,7 @@ contains
                   endif
 
                   ! compute the net flux
-                  fluxNet0(j) = qin_test - qout_test - qflx_rootsoi_col(c,j) 
+                  fluxNet0(j) = qin_test - qout_test - qflx_rootsoi_col(c,j)
 
                ! flux calculation is inexpensive
                else
@@ -1497,17 +1500,17 @@ contains
  real(r8) :: s2(1:nlayers)                     ! "s" at layer node
     real(r8) :: dsmpds                         !temporary variable
     real(r8) :: dhkds                          !temporary variable
-    character(len=32)  :: subname = 'calculate_hydraulic_properties'     ! subroutine name   
+    character(len=32)  :: subname = 'calculate_hydraulic_properties'     ! subroutine name
     !-----------------------------------------------------------------------
 
-!scs: originally, associate statements selected sections rather than 
+!scs: originally, associate statements selected sections rather than
 !     entire arrays, but due to pgi bug, removed array section selections
 !     using array sections allowed consistent 1d indexing throughout
     associate(&
-         icefrac           =>    soilhydrology_inst%icefrac_col     , & ! Input:  [real(r8) (:,:) ]  fraction of ice                                 
-         watsat            =>    soilstate_inst%watsat_col          , & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)  
-         smp_l             =>    soilstate_inst%smp_l_col           , & ! Input:  [real(r8) (:,:) ]  soil matrix potential [mm]                      
-         hk_l              =>    soilstate_inst%hk_l_col              & ! Input:  [real(r8) (:,:) ]  hydraulic conductivity (mm/s)                   
+         icefrac           =>    soilhydrology_inst%icefrac_col     , & ! Input:  [real(r8) (:,:) ]  fraction of ice
+         watsat            =>    soilstate_inst%watsat_col          , & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)
+         smp_l             =>    soilstate_inst%smp_l_col           , & ! Input:  [real(r8) (:,:) ]  soil matrix potential [mm]
+         hk_l              =>    soilstate_inst%hk_l_col              & ! Input:  [real(r8) (:,:) ]  hydraulic conductivity (mm/s)
          )  ! end associate statement
 
          hk     = 0._r8
@@ -1515,7 +1518,7 @@ contains
          dhkdw  = 0._r8
          dsmpdw = 0._r8
          imped  = 0._r8
-      
+
          ! Hydraulic conductivity and soil matric potential and their derivatives
 
          ! compute the relative saturation at each layer first b/c
@@ -1552,12 +1555,12 @@ contains
             !        w.r.t relative raturation at the layer interface
             !          --> the derivatives at the nodes are calculated
             !               in compute_moisture_fluxes_and_derivs
-            dhkdw(j) = dhkds  ! NOTE: the variable name does not make sense 
-            
+            dhkdw(j) = dhkds  ! NOTE: the variable name does not make sense
+
             ! compute derivative w.r.t. volumetric liquid water content
             ! NOTE: derivative for the layer
-            dsmpdw(j) = dsmpds /  watsat(c,j) 
-            
+            dsmpdw(j) = dsmpds /  watsat(c,j)
+
             ! save for the output
             smp_l(c,j) = smp(j)
             hk_l(c,j) = hk(j)
@@ -1630,20 +1633,20 @@ contains
 !scs: temporarily use local variables for the following
     real(r8) :: vwc_liq_ub   ! liquid volumetric water content at upper boundary
     real(r8) :: vwc_liq_lb   ! liquid volumetric water content at lower boundary
-    character(len=32)  :: subname = 'calculate_moisture_fluxes_and_derivs'     ! subroutine name   
+    character(len=32)  :: subname = 'calculate_moisture_fluxes_and_derivs'     ! subroutine name
     integer  :: jwt              !index of layer above water table
     real(r8) :: dhkdw1, dsmpdw1, dsmpds1
     integer,parameter :: zdflag = 0
     !-----------------------------------------------------------------------
 
     associate(&
-         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)                                 
-         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  interface level below a "z" level (m)           
-         dz                =>    col%dz                            , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)                             
-         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)                             
-         t_soisno          =>    temperature_inst%t_soisno_col      , & ! Input:  [real(r8) (:,:) ]  soil temperature (Kelvin)                      
-         qflx_infl         =>    waterfluxbulk_inst%qflx_infl_col       , & ! Input:  [real(r8) (:)   ]  infiltration (mm H2O /s)                          
-         watsat            =>    soilstate_inst%watsat_col            & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)  
+         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)
+         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  interface level below a "z" level (m)
+         dz                =>    col%dz                            , & ! Input:  [real(r8) (:,:) ]  layer thickness (m)
+         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)
+         t_soisno          =>    temperature_inst%t_soisno_col      , & ! Input:  [real(r8) (:,:) ]  soil temperature (Kelvin)
+         qflx_infl         =>    waterfluxbulk_inst%qflx_infl_col       , & ! Input:  [real(r8) (:)   ]  infiltration (mm H2O /s)
+         watsat            =>    soilstate_inst%watsat_col            & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)
          )  ! end associate statement
 
       qin    = 0._r8
@@ -1656,48 +1659,48 @@ contains
     ! Soil moisture fluxes and their derivatives
 
     j = 1
-       
+
     ! select type of boundary condition
     select case(upper_boundary_condition)
-          
+
        ! head boundary conditions
        case(bc_head)
-          
+
           ! compute the relative saturation at the upper boundary
           s1 = vwc_liq_ub / watsat(c,j)
           !               s1 = (vwc_liq_ub - watres(c,j)) / (watsat(c,j) - watres(c,j))
           s1 = min(s1, 1._r8)
           s1 = max(0.01_r8, s1)
-          
+
           ! compute the hydraulic conductivity and matric potential at the boundary
             call soil_water_retention_curve%soil_hk(c, j, s1, &
                  imped(j), soilstate_inst, hk1)
 
             call soil_water_retention_curve%soil_suction(c, j, s1, &
                  soilstate_inst,smp1)
-          
+
           ! compute the infiltration to the top of the layer
           den      = z(c,j)* m_to_mm * 0.5_r8
           qin(j) = -hk1*(smp(j) - smp1)/den + hk1
-          
+
           ! compute the flux derivative w.r.t influx
           dqidw1(j) = -hk1*dsmpdw(j)/den
-          
+
        ! flux boundary condition
        case(bc_flux)
-          
+
           ! specify infiltration
           qin(j) = qflx_infl(c)
-          
+
           ! compute the flux derivative w.r.t influx
           dqidw1(j) = 0._r8
-          
+
        ! check the case is specified correctly
        case default
-          
+
           call endrun(subname // ':: the upper boundary condition must be specified!')
-          
-    end select       
+
+    end select
 
     ! NOTE: the rest of the code for j=1 is identical to the code for
     !         the interior nodes (j=2,...,nlevsoi-1)
@@ -1711,7 +1714,7 @@ contains
     dhkds2 = 0.5_r8 * dhkdw(j) / watsat(c,j+1) ! derivative w.r.t. volumetric liquid water in the lower layer
 
 !scs: this is how zd is done
-    if (zdflag == 1) then 
+    if (zdflag == 1) then
        dhkds1 = dhkdw(j)/(watsat(c,j)+watsat(c,min(nlevsoi, j+1)))
        dhkds2 = dhkds1
     endif
@@ -1731,14 +1734,14 @@ contains
     ! Interior nodes
 
     do j = 2, nlayers - 1
-          
+
        ! get the flux from above
        qin(j) = qout(j-1)
-          
+
        ! get the derivatives from above
        dqidw0(j) = dqodw1(j-1)
        dqidw1(j) = dqodw2(j-1)
-          
+
        ! compute derivatives in hydraulic conductivity at the interface w.r.t.
        !  volumetric liquid water content in the layer above and the layer below
        ! NOTE: dhkdw(j) is the derivative in hydrualic conductivity at the
@@ -1746,35 +1749,35 @@ contains
        dhkds1 = 0.5_r8 * dhkdw(j) / watsat(c,j)   ! derivative w.r.t. volumetric liquid water in the upper layer
        dhkds2 = 0.5_r8 * dhkdw(j) / watsat(c,j+1) ! derivative w.r.t. volumetric liquid water in the lower layer
 !scs: this is how zd is done
-             if (zdflag == 1) then 
+             if (zdflag == 1) then
                 dhkds1 = dhkdw(j)/(watsat(c,j)+watsat(c,min(nlevsoi, j+1)))
                 dhkds2 = dhkds1
              endif
 !scs
-          
+
        ! compute flux at the bottom of the j-th layer
        ! NOTE: hk(j) is hydraulic conductivity at the bottom of the j-th  layer
        num    = (smp(j+1)-smp(j))
        den    = m_to_mm * (z(c,j+1)-z(c,j))
        qout(j)   = -hk(j)*num/den + hk(j)
-          
+
        ! compute flux derivatives
-       dqodw1(j) = (hk(j)*dsmpdw(j) - dhkds1*num)/den + dhkds1 
+       dqodw1(j) = (hk(j)*dsmpdw(j) - dhkds1*num)/den + dhkds1
        dqodw2(j) = (-hk(j)*dsmpdw(j+1) - dhkds2*num)/den + dhkds2
 
     end do
 
     ! Node j=nlevsoi (bottom)
-    
+
     j = nlayers
-       
+
     ! get the flux from above
     qin(j) = qout(j-1)
-       
+
     ! get the derivatives from above
     dqidw0(j) = dqodw1(j-1)
     dqidw1(j) = dqodw2(j-1)
-       
+
     ! select type of boundary condition
     select case(lower_boundary_condition)
 
@@ -1808,7 +1811,7 @@ contains
              dhkds1 = dhkdw(j) / watsat(c,j)
 
 !scs: this is how zd is done
-             if (zdflag == 1) then 
+             if (zdflag == 1) then
                 dhkds1 = dhkdw(j)/(watsat(c,j)+watsat(c,min(nlevsoi, j+1)))
                 dhkds2 = dhkds1
              endif
@@ -1824,58 +1827,58 @@ contains
 
           endif  ! switch between water table above/below soil column
 
-          
+
        ! head boundary conditions
        case(bc_head)
-          
+
           ! compute the relative saturation at the lower boundary
           s1 = vwc_liq_lb / watsat(c,j)
 !scs: mc's original expression          s1 = (vwc_liq_lb - watres(c,j)) / (watsat(c,j) - watres(c,j))
           s1 = min(s1, 1._r8)
           s1 = max(0.01_r8, s1)
-          
+
           ! compute the hydraulic conductivity and matric potential at the boundary
             call soil_water_retention_curve%soil_hk(c, j, s1, &
                  imped(j), soilstate_inst, hk1)
 
             call soil_water_retention_curve%soil_suction(c, j, s1, &
                  soilstate_inst,smp1)
-       
+
           ! compute the flux at the bottom of the layer
           den      = m_to_mm * z(c,j) * 0.5_r8
           qout(j) = -hk1*(smp1 - smp(j))/den + hk1
-          
+
           ! compute the flux derivative
           dqodw1(j) = hk1*dsmpdw(j)/den
 
           ! stop, because not tested yet
           call endrun(subname // ':: the specified lower boundary condition is not fully implemented/tested yet')
-          
+
        ! flux boundary condition
        case(bc_flux)
-          
+
           ! free drainage
           qout(j) = hk(j)
-          
+
           ! compute the flux derivative
           dqodw1(j) = dhkdw(j) / watsat(c,j)
 
        case(bc_zero_flux)
-    
+
           ! no drainage
           qout(j) = 0.
-          
+
           ! compute the flux derivative
           dqodw1(j) = 0.
 
        ! check the case is specified correctly
        case default
-          
+
        call endrun(subname // ':: the lower boundary condition must be specified!')
-       
+
     end select
-       
-    
+
+
     end associate
 
    end subroutine compute_moisture_fluxes_and_derivs
@@ -1916,11 +1919,11 @@ contains
     integer,parameter :: ixIterate=1
     integer,parameter :: ixNonIterate=2
     integer           :: iterateOption=ixNonIterate
-    character(len=32)  :: subname = 'compute_RHS_moisture_form'     ! subroutine name   
+    character(len=32)  :: subname = 'compute_RHS_moisture_form'     ! subroutine name
     !-----------------------------------------------------------------------
 
     associate(&
-         dz                 =>    col%dz                               & ! Input:  [real(r8) (:,:) ]  layer depth (m)                                 
+         dz                 =>    col%dz                               & ! Input:  [real(r8) (:,:) ]  layer depth (m)
          )  ! end associate statement
 
          rmx = 0._r8
@@ -1946,7 +1949,7 @@ contains
             end select
 
          end do
-   
+
     end associate
 
    end subroutine compute_RHS_moisture_form
@@ -1960,7 +1963,7 @@ contains
     ! !DESCRIPTION:
 
     ! Calculate LHS of moisture-based form of Richards equation
-    ! LHS is a tridiagonal matrix 
+    ! LHS is a tridiagonal matrix
     !
     ! !USES:
     use shr_kind_mod         , only : r8 => shr_kind_r8
@@ -1989,13 +1992,13 @@ contains
     !
     ! !LOCAL VARIABLES:
     integer  :: j                                     ! do loop indices
-    character(len=32)  :: subname = 'compute_LHS_moisture_form'     ! subroutine name   
+    character(len=32)  :: subname = 'compute_LHS_moisture_form'     ! subroutine name
     integer  :: jwt              !index of layer above water table
     !-----------------------------------------------------------------------
 
     associate(&
-         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  layer interface depth (m)                                 
-         zwt               =>    soilhydrology_inst%zwt_col           & ! Input:  [real(r8) (:)   ]  water table depth (m)                             
+         zi                =>    col%zi                             , & ! Input:  [real(r8) (:,:) ]  layer interface depth (m)
+         zwt               =>    soilhydrology_inst%zwt_col           & ! Input:  [real(r8) (:)   ]  water table depth (m)
          )  ! end associate statement
 
 
@@ -2008,19 +2011,19 @@ contains
       j=1
       amx(j)    = 0._r8
       bmx(j)    = -1._r8 - (-dqidw1(j) + dqodw1(j))*dt_dz(j)
-      cmx(j)    = -dqodw2(j)*dt_dz(j)         
+      cmx(j)    = -dqodw2(j)*dt_dz(j)
 
-!  Interior soil layers      
+!  Interior soil layers
       do j = 2, nlayers-1
          amx(j)    = dqidw0(j)*dt_dz(j)
          bmx(j)    = -1._r8 - (-dqidw1(j) + dqodw1(j))*dt_dz(j)
-         cmx(j)    = -dqodw2(j)*dt_dz(j)            
+         cmx(j)    = -dqodw2(j)*dt_dz(j)
       enddo
 
          j=nlayers
          amx(j)    = dqidw0(j)*dt_dz(j)
          bmx(j)    = -1._r8 - (-dqidw1(j) + dqodw1(j))*dt_dz(j)
-         cmx(j)    = 0._r8         
+         cmx(j)    = 0._r8
 
     end associate
 
@@ -2082,19 +2085,19 @@ contains
     real(r8) :: s1            !temporary variable
     real(r8) :: dz_aquifer        !temporary variable
 
-    character(len=32)  :: subname = 'compute_qcharge'     ! subroutine name   
+    character(len=32)  :: subname = 'compute_qcharge'     ! subroutine name
     !-----------------------------------------------------------------------
 
     associate(&
-         qcharge           =>    soilhydrology_inst%qcharge_col     , & ! Input:  [real(r8) (:)   ]  aquifer recharge rate (mm/s)                      
-         wa                => waterstatebulk_inst%wa_col             , & ! Input:  [real(r8) (:)   ]  water in the unconfined aquifer (mm)              
-         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)                             
-         sucsat            =>    soilstate_inst%sucsat_col          , & ! Input:  [real(r8) (:,:) ]  minimum soil suction (mm)                       
-         watsat            =>    soilstate_inst%watsat_col          , & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)  
-         smpmin            =>    soilstate_inst%smpmin_col          , & ! Input:  [real(r8) (:)   ]  restriction for min of soil potential (mm)        
+         qcharge           =>    soilhydrology_inst%qcharge_col     , & ! Input:  [real(r8) (:)   ]  aquifer recharge rate (mm/s)
+         wa                => waterstatebulk_inst%wa_col             , & ! Input:  [real(r8) (:)   ]  water in the unconfined aquifer (mm)
+         zwt               =>    soilhydrology_inst%zwt_col         , & ! Input:  [real(r8) (:)   ]  water table depth (m)
+         sucsat            =>    soilstate_inst%sucsat_col          , & ! Input:  [real(r8) (:,:) ]  minimum soil suction (mm)
+         watsat            =>    soilstate_inst%watsat_col          , & ! Input:  [real(r8) (:,:) ]  volumetric soil water at saturation (porosity)
+         smpmin            =>    soilstate_inst%smpmin_col          , & ! Input:  [real(r8) (:)   ]  restriction for min of soil potential (mm)
          h2osoi_vol        =>    waterstatebulk_inst%h2osoi_vol_col     , & ! Input:  [real(r8) (:,:) ]  volumetric soil water (0<=h2osoi_vol<=watsat) [m3/m3]
-         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)                                 
-         zi                =>    col%zi                               & ! Input:  [real(r8) (:,:) ]  layer interface depth (m)                                 
+         z                 =>    col%z                              , & ! Input:  [real(r8) (:,:) ]  layer depth (m)
+         zi                =>    col%zi                               & ! Input:  [real(r8) (:,:) ]  layer interface depth (m)
          )  ! end associate statement
 
       ! Get time step
@@ -2144,7 +2147,7 @@ contains
          endif
 
       end do
-   
+
     end associate
 
    end subroutine compute_qcharge
@@ -2187,7 +2190,7 @@ contains
     use column_varcon  , only : icol_roof, icol_sunwall, icol_shadewall
     use clm_varctl     , only : iulog
     use decompMod      , only : bounds_type
-    use ColumnType     , only : col                
+    use ColumnType     , only : col
     !
     ! !ARGUMENTS:
     implicit none
@@ -2233,7 +2236,7 @@ contains
           u(j) = u(j) - gam(j+1) * u(j+1)
        end if
     end do
-    
+
   end subroutine TridiagonalCol
 
  end module SoilWaterMovementMod
