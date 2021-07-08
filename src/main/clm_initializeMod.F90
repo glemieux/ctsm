@@ -478,6 +478,7 @@ contains
        end if
 
        ! Create new template file using cold start
+       write(iulog,*) 'initialize2: calling restFile_write'
        call restFile_write(bounds_proc, finidat_interp_dest, writing_finidat_interp_dest_file=.true.)
 
        ! Interpolate finidat onto new template file

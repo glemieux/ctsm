@@ -202,6 +202,8 @@ contains
     ! are passed to CLM in initialization, then this code block can be removed.
     ! ========================================================================
 
+    write(iulog,*) 'clm_drv: start esai: ', canopystate_inst%esai_patch
+
     need_glacier_initialization = is_first_step()
 
     if (need_glacier_initialization) then
@@ -244,6 +246,8 @@ contains
        end if
 
     end if
+
+    write(iulog,*) 'clm_drv: post interpMonthlyVeg esai: ', canopystate_inst%esai_patch
 
     ! ==================================================================================
     ! Determine decomp vertical profiles
@@ -351,6 +355,8 @@ contains
          soilbiogeochem_nitrogenstate_inst, soilbiogeochem_carbonflux_inst, ch4_inst, &
          glc_behavior)
     call t_stopf('dyn_subgrid')
+
+    write(iulog,*) 'clm_drv: post-dynSubgrid esai: ', canopystate_inst%esai_patch
 
     ! ============================================================================
     ! If soil moisture is prescribed from data streams set it here
@@ -471,6 +477,7 @@ contains
             canopystate_inst, water_inst%waterstatebulk_inst, &
             water_inst%waterdiagnosticbulk_inst, &
             energyflux_inst)
+        write(iulog,*) 'clm_drv: post-clm_drv_init esai: ', canopystate_inst%esai_patch
 
        call topo_inst%UpdateTopo(bounds_clump, &
             filter(nc)%num_icemecc, filter(nc)%icemecc, &
@@ -580,7 +587,7 @@ contains
                                    solarabs_inst)
        end if
 
-
+       write(iulog,*) 'clm_drv: post sun shade esai: ', canopystate_inst%esai_patch
 
        call SurfaceRadiation(bounds_clump,                                 &
             filter(nc)%num_nourbanp, filter(nc)%nourbanp,                  &
@@ -589,6 +596,8 @@ contains
             atm2lnd_inst, water_inst%waterdiagnosticbulk_inst, &
             canopystate_inst, surfalb_inst, &
             solarabs_inst, surfrad_inst)
+
+       write(iulog,*) 'clm_drv: post surf rad esai: ', canopystate_inst%esai_patch
 
        ! Surface Radiation for only urban columns
 
@@ -619,6 +628,8 @@ contains
             soilstate_inst, temperature_inst, &
             water_inst%wateratm2lndbulk_inst, water_inst%waterdiagnosticbulk_inst, &
             water_inst%waterstatebulk_inst)
+
+       write(iulog,*) 'clm_drv: post biogeophyspreflux esai: ', canopystate_inst%esai_patch
 
        call ozone_inst%CalcOzoneStress(bounds_clump, filter(nc)%num_exposedvegp, filter(nc)%exposedvegp)
 
@@ -695,6 +706,8 @@ contains
             croot_carbon = croot_carbon(bounds_clump%begp:bounds_clump%endp))
        deallocate(downreg_patch, leafn_patch, froot_carbon, croot_carbon)
        call t_stopf('canflux')
+
+       write(iulog,*) 'clm_drv: post-canopyflux esai: ', canopystate_inst%esai_patch
 
        ! Fluxes for all urban landunits
 
@@ -915,7 +928,7 @@ contains
             scf_method, water_inst, &
             atm2lnd_inst, temperature_inst, soilstate_inst, &
             energyflux_inst, aerosol_inst, lakestate_inst, topo_inst)
-       write(iulog,*) 'clm_drv: LakeHydrology: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
+       write(iulog,*) 'clm_drv: LakeHydrology: h2osoi_vol_col: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        !  Calculate column-integrated aerosol masses, and
        !  mass concentrations for radiative calculations and output
@@ -1418,6 +1431,7 @@ contains
           call t_startf('clm_drv_io_wrest')
           filer = restFile_filename(rdate=rdate)
 
+          write(iulog,*) 'clm_drv: calling restFile_write'
           call restFile_write( bounds_proc, filer, &
                writing_finidat_interp_dest_file=.false., rdate=rdate )
 
