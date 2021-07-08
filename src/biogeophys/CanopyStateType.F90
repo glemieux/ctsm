@@ -13,6 +13,7 @@ module CanopyStateType
   use clm_varctl      , only : iulog, use_cn, use_fates, use_fates_sp, use_hydrstress
   use LandunitType    , only : lun
   use PatchType       , only : patch
+  use clm_time_manager  , only : is_restart
   !
   implicit none
   save
@@ -520,9 +521,14 @@ contains
           this%laisha_patch(p) = 0._r8
        end if
 
-       this%tlai_hist_patch(p)       = 0._r8
-       this%tsai_hist_patch(p)       = 0._r8
-       this%htop_hist_patch(p)       = 0._r8
+       if(.not.is_restart)then
+
+          write(iulog,*) 'canopystate_inst%initcold: tsai_hist_patch zero'
+          this%tlai_hist_patch(p)       = 0._r8
+          this%tsai_hist_patch(p)       = 0._r8
+          this%htop_hist_patch(p)       = 0._r8
+
+       end if
 
        ! needs to be initialized to spval to avoid problems when averaging for the accum
        ! field

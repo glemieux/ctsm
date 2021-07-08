@@ -856,6 +856,7 @@ module CLMFatesInterfaceMod
                ! here we are mapping from P space in the HLM to FT space in the sp_input arrays.
                p = ft + col%patchi(c) ! for an FT of 1 we want to use
                write(iulog,*) 'dynamics_driv: pre-hlm_sp_tsai/tsai_patch 1: ', canopystate_inst%tsai_patch(p)
+               write(iulog,*) 'dynamics_driv: tsai_hist_patch 1: ', canopystate_inst%tsai_hist_patch(p)
 
                this%fates(nc)%bc_in(s)%hlm_sp_tlai(ft) = canopystate_inst%tlai_patch(p)
                this%fates(nc)%bc_in(s)%hlm_sp_tsai(ft) = canopystate_inst%tsai_patch(p)
@@ -865,6 +866,7 @@ module CLMFatesInterfaceMod
                endif
 
                write(iulog,*) 'dynamics_driv: hlm_sp_tsai/tsai_patch 2: ', canopystate_inst%tsai_patch(p)
+               write(iulog,*) 'dynamics_driv: tsai_hist_patch 2: ', canopystate_inst%tsai_hist_patch(p)
            end do ! p
          end if ! SP
 
@@ -1445,6 +1447,7 @@ module CLMFatesInterfaceMod
                         ! here we are mapping from P space in the HLM to FT space in the sp_input arrays.
                         p = ft + col%patchi(c) ! for an FT of 1 we want to use
                         write(iulog,*) 'restart: pre-hlm_sp_tsai/tsai_patch 1: ', canopystate_inst%tsai_patch(p)
+                        write(iulog,*) 'restart: tsai_hist_patch 1: ', canopystate_inst%tsai_hist_patch(p)
 
                         this%fates(nc)%bc_in(s)%hlm_sp_tlai(ft) = canopystate_inst%tlai_patch(p)
                         this%fates(nc)%bc_in(s)%hlm_sp_tsai(ft) = canopystate_inst%tsai_patch(p)
@@ -1454,6 +1457,7 @@ module CLMFatesInterfaceMod
                         endif
 
                         write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch 2: ', canopystate_inst%tsai_patch(p)
+                        write(iulog,*) 'restart: tsai_hist_patch 2: ', canopystate_inst%tsai_hist_patch(p)
                      end do ! p
                      write(iulog,*) 'restart: calling satellite_phenology'
                      call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
