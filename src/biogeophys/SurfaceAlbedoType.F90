@@ -390,7 +390,7 @@ contains
        do iv=1,nlevcan
           this%tsai_z_patch(begp:endp,iv) = tsai_patch(begp:endp) / nlevcan
           write(iulog,*) 'surfacealb_inst%restart: tsai_patch: ', tsai_patch(begp:endp)
-          write(iulog,*) 'surfacealb_inst%restart: esai_patch: ', esai_patch(begp:endp)
+          !write(iulog,*) 'surfacealb_inst%restart: esai_patch: ', esai_patch(begp:endp)
        end do
     end if
 

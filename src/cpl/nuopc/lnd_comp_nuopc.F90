@@ -76,7 +76,7 @@ module lnd_comp_nuopc
   real(R8)               :: orb_mvelp       ! attribute - moving vernal equinox longitude
   real(R8)               :: orb_eccen       ! attribute and update-  orbital eccentricity
 
-  logical                :: scol_valid      ! if single_column, does point have a mask of zero 
+  logical                :: scol_valid      ! if single_column, does point have a mask of zero
 
   character(len=*) , parameter :: orb_fixed_year       = 'fixed_year'
   character(len=*) , parameter :: orb_variable_year    = 'variable_year'
@@ -322,7 +322,7 @@ contains
     use decompMod                 , only : ldecomp, bounds_type, get_proc_bounds
     use lnd_set_decomp_and_domain , only : lnd_set_decomp_and_domain_from_readmesh
     use lnd_set_decomp_and_domain , only : lnd_set_mesh_for_single_column
-    use lnd_set_decomp_and_domain , only : lnd_set_decomp_and_domain_for_single_column 
+    use lnd_set_decomp_and_domain , only : lnd_set_decomp_and_domain_for_single_column
 
     ! input/output variables
     type(ESMF_GridComp)  :: gcomp
@@ -384,7 +384,7 @@ contains
     call ESMF_LogWrite(subname//' called', ESMF_LOGMSG_INFO)
 
     !----------------------------------------------------------------------------
-    ! Single column logic - if mask is zero for nearest neighbor search then 
+    ! Single column logic - if mask is zero for nearest neighbor search then
     ! set all export state fields to zero and return
     !----------------------------------------------------------------------------
 
