@@ -521,7 +521,7 @@ contains
           this%laisha_patch(p) = 0._r8
        end if
 
-       if(.not.is_restart)then
+       if(.not.is_restart())then
 
           write(iulog,*) 'canopystate_inst%initcold: tsai_hist_patch zero'
           this%tlai_hist_patch(p)       = 0._r8
