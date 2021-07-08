@@ -500,6 +500,10 @@ contains
 
     !-----------------------------------------------------------------------
 
+
+    write(iulog,*)'clm_instRest: start: canopystate_inst%tsai_patch: ', canopystate_inst%tsai_patch(bounds%begp:bounds%endp)
+    write(iulog,*)'clm_instRest: start: canopystate_inst%esai_patch: ', canopystate_inst%esai_patch(bounds%begp:bounds%endp)
+
     call active_layer_inst%restart (bounds, ncid, flag=flag)
 
     call atm2lnd_inst%restart (bounds, ncid, flag=flag)
@@ -540,7 +544,8 @@ contains
          tlai_patch=canopystate_inst%tlai_patch(bounds%begp:bounds%endp), &
          tsai_patch=canopystate_inst%tsai_patch(bounds%begp:bounds%endp))
 
-   write(iulog,*)'clm_instRest: canopystate_inst%tsai_patch: ', canopystate_inst%tsai_patch(bounds%begp:bounds%endp)
+   write(iulog,*)'clm_instRest: post-surbalb: canopystate_inst%tsai_patch: ', canopystate_inst%tsai_patch(bounds%begp:bounds%endp)
+   write(iulog,*)'clm_instRest: post-surbalb: canopystate_inst%esai_patch: ', canopystate_inst%esai_patch(bounds%begp:bounds%endp)
 
     call topo_inst%restart (bounds, ncid, flag=flag)
 
@@ -587,6 +592,9 @@ contains
             soilstate_inst=soilstate_inst)
 
     end if
+
+    write(iulog,*)'clm_instRest: end: canopystate_inst%tsai_patch: ', canopystate_inst%tsai_patch(bounds%begp:bounds%endp)
+    write(iulog,*)'clm_instRest: end: canopystate_inst%esai_patch: ', canopystate_inst%esai_patch(bounds%begp:bounds%endp)
 
  end subroutine clm_instRest
 

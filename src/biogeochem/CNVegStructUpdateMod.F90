@@ -154,6 +154,7 @@ contains
             tsai_old = tsai(p) ! n-1 value
 
             write(iulog,*) 'CNVegStructUpdate: tsai_old: ', tsai_old
+            write(iulog,*) 'CNVegStructUpdate: esai: ', esai(p)
 
             ! update the leaf area index based on leafC and SLA
             ! Eq 3 from Thornton and Zimmerman, 2007, J Clim, 20, 3902-3923.
@@ -184,6 +185,7 @@ contains
             tsai(p) = max(tsai_alpha*tsai_old+max(tlai_old-tlai(p),0._r8),tsai_min)
 
             write(iulog,*) 'CNVegStructUpdate: tsai_alpha: tsai(p): ', tsai(p)
+            write(iulog,*) 'CNVegStructUpdate: tsai_alpha: esai(p): ', esai(p)
 
             ! calculate vegetation physiological parameters used in biomass heat storage
             !
@@ -257,6 +259,7 @@ contains
                end if
 
                write(iulog,*) 'CNVegStructUpdate: prognostic crop: tsai(p): ', tsai(p)
+               write(iulog,*) 'CNVegStructUpdate: prognostic crop: esai(p): ', esai(p)
 
                ! "stubble" after harvest
                if (harvdate(p) < 999 .and. tlai(p) == 0._r8) then
@@ -266,6 +269,7 @@ contains
                end if
 
                write(iulog,*) 'CNVegStructUpdate: stubble: tsai(p): ', tsai(p)
+               write(iulog,*) 'CNVegStructUpdate: stubble: esai(p): ', esai(p)
 
                !if (harvdate(p) < 999 .and. tlai(p) > 0._r8) write(iulog,*) 'CNVegStructUpdate: tlai>0 after harvest!' ! remove after initial debugging?
 
@@ -299,6 +303,7 @@ contains
             hbot(p) = 0._r8
 
             write(iulog,*) 'CNVegStructUpdate: not woody: tsai(p): ', tsai(p)
+            write(iulog,*) 'CNVegStructUpdate: not woody: esai(p): ', esai(p)
 
          end if
 

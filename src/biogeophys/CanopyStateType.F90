@@ -583,12 +583,14 @@ contains
      interpinic_flag='interp', readvar=readvar, data=this%tlai_patch)
 
      write(iulog,*)'canopystate_inst%restart: pre-call: tsai_patch: ', this%tsai_patch
+     write(iulog,*)'canopystate_inst%restart: pre-call: esai_patch: ', this%esai_patch
 
      call restartvar(ncid=ncid, flag=flag, varname='tsai', xtype=ncd_double,  &
           dim1name='pft', long_name='one-sided stem area index, no burying by snow', units='', &
           interpinic_flag='interp', readvar=readvar, data=this%tsai_patch)
 
      write(iulog,*)'canopystate_inst%restart: post-call: tsai_patch: ', this%tsai_patch
+     write(iulog,*)'canopystate_inst%restart: post-call: esai_patch: ', this%esai_patch
 
      call restartvar(ncid=ncid, flag=flag, varname='htop', xtype=ncd_double,  &
           dim1name='pft', long_name='canopy top', units='m', &
