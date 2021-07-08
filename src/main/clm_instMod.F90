@@ -15,6 +15,7 @@ module clm_instMod
   use perf_mod        , only : t_startf, t_stopf
   use controlMod      , only : NLFilename
   use fileutils       , only : getfil
+  use clm_varctl            , only : iulog
   use ncdio_pio       , only : file_desc_t, ncd_pio_openfile, ncd_pio_closefile
 
   !-----------------------------------------
