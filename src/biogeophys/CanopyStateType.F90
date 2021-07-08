@@ -562,20 +562,20 @@ contains
          dim1name='pft', long_name='fraction of vegetation not covered by snow (0 or 1)', units='', &
          interpinic_flag='interp', readvar=readvar, data=this%frac_veg_nosno_alb_patch)
 
-    if (use_fates_sp)then
-    call restartvar(ncid=ncid, flag=flag, varname='tlai', xtype=ncd_double,  &
-         dim1name='pft', long_name='one-sided leaf area index, no burying by snow', units='', &
-         interpinic_flag='interp', readvar=readvar, data=this%tlai_hist_patch)
+!     if (use_fates_sp)then
+!     call restartvar(ncid=ncid, flag=flag, varname='tlai', xtype=ncd_double,  &
+!          dim1name='pft', long_name='one-sided leaf area index, no burying by snow', units='', &
+!          interpinic_flag='interp', readvar=readvar, data=this%tlai_hist_patch)
 
-    call restartvar(ncid=ncid, flag=flag, varname='tsai', xtype=ncd_double,  &
-         dim1name='pft', long_name='one-sided stem area index, no burying by snow', units='', &
-         interpinic_flag='interp', readvar=readvar, data=this%tsai_hist_patch)
+!     call restartvar(ncid=ncid, flag=flag, varname='tsai', xtype=ncd_double,  &
+!          dim1name='pft', long_name='one-sided stem area index, no burying by snow', units='', &
+!          interpinic_flag='interp', readvar=readvar, data=this%tsai_hist_patch)
 
-    call restartvar(ncid=ncid, flag=flag, varname='htop', xtype=ncd_double,  &
-         dim1name='pft', long_name='canopy top', units='m', &
-         interpinic_flag='interp', readvar=readvar, data=this%htop_hist_patch)
+!     call restartvar(ncid=ncid, flag=flag, varname='htop', xtype=ncd_double,  &
+!          dim1name='pft', long_name='canopy top', units='m', &
+!          interpinic_flag='interp', readvar=readvar, data=this%htop_hist_patch)
 
-    else
+!     else
      call restartvar(ncid=ncid, flag=flag, varname='tlai', xtype=ncd_double,  &
      dim1name='pft', long_name='one-sided leaf area index, no burying by snow', units='', &
      interpinic_flag='interp', readvar=readvar, data=this%tlai_patch)
@@ -587,7 +587,7 @@ contains
      call restartvar(ncid=ncid, flag=flag, varname='htop', xtype=ncd_double,  &
           dim1name='pft', long_name='canopy top', units='m', &
           interpinic_flag='interp', readvar=readvar, data=this%htop_patch)
-    endif
+!     endif
 
     call restartvar(ncid=ncid, flag=flag, varname='elai', xtype=ncd_double,  &
          dim1name='pft', long_name='one-sided leaf area index, with burying by snow', units='', &
