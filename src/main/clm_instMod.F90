@@ -593,8 +593,10 @@ contains
 
     end if
 
-    write(iulog,*)'clm_instRest: end: canopystate_inst%tsai_patch: ', canopystate_inst%tsai_patch(bounds%begp:bounds%endp)
-    write(iulog,*)'clm_instRest: end: canopystate_inst%esai_patch: ', canopystate_inst%esai_patch(bounds%begp:bounds%endp)
+    write(iulog,*)'clm_instRest: end: tsai_patch: ', canopystate_inst%tsai_patch(bounds%begp:bounds%endp)
+    write(iulog,*)'clm_instRest: end: esai_patch: ', canopystate_inst%esai_patch(bounds%begp:bounds%endp)
+    write(iulog,*)'clm_instRest: end: tsai_history_patch: ', canopystate_inst%tsai_history_patch(bounds%begp:bounds%endp)
+    write(iulog,*)'clm_instRest: end: esai_history_patch: ', canopystate_inst%esai_history_patch(bounds%begp:bounds%endp)
 
  end subroutine clm_instRest
 
