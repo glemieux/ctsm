@@ -1046,11 +1046,21 @@ module CLMFatesInterfaceMod
           this%fates(nc)%bc_in(s)%frac_sno_eff_si = frac_sno_eff(c)
        end do
 
+       write(iulog,*) 'wrap_update_hlmfates_dyn: pre-canopy_summ tsai_hist_patch: ', tsai
+       write(iulog,*) 'wrap_update_hlmfates_dyn: pre-canopy_summ tlai_hist_patch: ', tlai
+       write(iulog,*) 'wrap_update_hlmfates_dyn: pre-canopy_summ esai_patch: ', esai
+       write(iulog,*) 'wrap_update_hlmfates_dyn: pre-canopy_summ elai_patch: ', elai
+
        ! Canopy diagnostics for FATES
        write(iulog,*) 'wrap_update_hlmfates_dyn: canopy_summarization'
        call canopy_summarization(this%fates(nc)%nsites, &
             this%fates(nc)%sites,  &
             this%fates(nc)%bc_in)
+
+         write(iulog,*) 'wrap_update_hlmfates_dyn: pre-udpate_hlm_dyn tsai_hist_patch: ', tsai
+         write(iulog,*) 'wrap_update_hlmfates_dyn: pre-udpate_hlm_dyn tlai_hist_patch: ', tlai
+         write(iulog,*) 'wrap_update_hlmfates_dyn: pre-udpate_hlm_dyn esai_patch: ', esai
+         write(iulog,*) 'wrap_update_hlmfates_dyn: pre-udpate_hlm_dyn elai_patch: ', elai
 
        ! Canopy diagnostic outputs for HLM
        write(iulog,*) 'wrap_update_hlmfates_dyn: update_hlm_dynamics'
