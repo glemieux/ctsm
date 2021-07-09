@@ -1484,8 +1484,8 @@ module CLMFatesInterfaceMod
                         endif
                      end do ! p
 
-                     write(iulog,*) 'restart: calling satellite_phenology'
-                     call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
+                     !write(iulog,*) 'restart: calling satellite_phenology'
+                     !call satellite_phenology(this%fates(nc)%sites(s),this%fates(nc)%bc_in(s))
 
                      write(iulog,*) 'restart: hlm_sp_tsai/tsai_patch 2: ', canopystate_inst%tsai_patch
                      write(iulog,*) 'restart: esai_patch 1: ', canopystate_inst%esai_patch
