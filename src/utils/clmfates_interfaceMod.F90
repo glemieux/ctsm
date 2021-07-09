@@ -1080,7 +1080,7 @@ module CLMFatesInterfaceMod
        ! variables is to inform patch%wtcol(p).  wt_ed is imposed on wtcol,
        ! but only for FATES columns.
 
-      if ( .not.is_restart() ) then
+      !if ( .not.is_restart() ) then
 
        patch%is_veg(bounds_clump%begp:bounds_clump%endp)        = .false.
        patch%is_bareground(bounds_clump%begp:bounds_clump%endp) = .false.
@@ -1185,7 +1185,7 @@ module CLMFatesInterfaceMod
 
        end do
 
-      endif
+      !endif
 
      end associate
 
