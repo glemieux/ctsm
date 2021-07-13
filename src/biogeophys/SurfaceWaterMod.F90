@@ -301,7 +301,6 @@ contains
        h2osfc_orig(c) = h2osfc(c)
        h2osfc(c) = h2osfc(c) - qflx_too_small_h2osfc_to_soil(c) * dtime
        h2osoi_liq(c,1) = h2osoi_liq(c,1) + qflx_too_small_h2osfc_to_soil(c) * dtime
-       write(iulog,*) 'UpdateState_TooSmallH2osfcToSoil: h2osoi_liq',h2osoi_liq(c,1)
     end do
 
     call truncate_small_values( &

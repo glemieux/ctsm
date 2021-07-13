@@ -14,13 +14,13 @@ module SoilWaterPlantSinkMod
          __FILE__
 
 contains
-   
+
    subroutine Compute_EffecRootFrac_And_VertTranSink(bounds, num_hydrologyc, &
          filter_hydrologyc, soilstate_inst, canopystate_inst, waterfluxbulk_inst, energyflux_inst)
-      
+
       ! ---------------------------------------------------------------------------------
       ! This is a wrapper for calculating the effective root fraction and soil
-      ! water sink due to plant transpiration. 
+      ! water sink due to plant transpiration.
       ! Calculate Soil Water Sink to Roots over different types
       ! of columns and for different process modules
       ! The super-set of all columns that should have a root water sink
@@ -42,7 +42,7 @@ contains
       use WaterFluxBulkType       , only : waterfluxbulk_type
       use CanopyStateType     , only : canopystate_type
       use EnergyFluxType      , only : energyflux_type
-      use ColumnType          , only : col 
+      use ColumnType          , only : col
       use LandunitType        , only : lun
 
       ! Arguments
@@ -62,8 +62,6 @@ contains
       integer  :: c
       integer  :: l
 
-      write(iulog,*) 'ComputeRootFracVertSing: use_hydrstress: ', use_hydrstress
-
       num_filterc_tot = 0
 
       ! 1) pervious roads
@@ -76,10 +74,7 @@ contains
          end if
       end do
       num_filterc_tot = num_filterc_tot+num_filterc
-      write(iulog,*) 'ComputeRootFracVertSing: num_filterc1: ', num_filterc
-      write(iulog,*) 'ComputeRootFracVertSing: filterc1: ', filterc 
-      write(iulog,*) 'ComputeRootFracVertSing: num_filterc_tot1: ', num_filterc_tot
-      if(use_hydrstress) then
+s      if(use_hydrstress) then
          call Compute_EffecRootFrac_And_VertTranSink_HydStress_Roads(bounds, &
                num_filterc,filterc, soilstate_inst, waterfluxbulk_inst)
       else
@@ -93,7 +88,7 @@ contains
       ! way for a specific LU or coverage type (RGK 04/2017).  Feel
       ! free to consolidate if there are no plans to do such a thing.
 
-         
+
       ! 2) not ( pervious road or natural vegetation) , everything else
       num_filterc = 0
       do fc = 1, num_hydrologyc
@@ -105,9 +100,6 @@ contains
          end if
       end do
       num_filterc_tot = num_filterc_tot+num_filterc
-      write(iulog,*) 'ComputeRootFracVertSing: num_filterc2: ', num_filterc
-      write(iulog,*) 'ComputeRootFracVertSing: filterc2: ', filterc 
-      write(iulog,*) 'ComputeRootFracVertSing: num_filterc_tot2: ', num_filterc_tot
       if(use_hydrstress) then
          call Compute_EffecRootFrac_And_VertTranSink_HydStress(bounds, &
                num_filterc, filterc, waterfluxbulk_inst, soilstate_inst, &
@@ -116,7 +108,7 @@ contains
          call Compute_EffecRootFrac_And_VertTranSink_Default(bounds, &
                num_filterc,filterc, soilstate_inst, waterfluxbulk_inst)
       end if
-      
+
 
       ! 3) Natural vegetation
       num_filterc = 0
@@ -129,9 +121,6 @@ contains
          end if
       end do
       num_filterc_tot = num_filterc_tot+num_filterc
-      write(iulog,*) 'ComputeRootFracVertSing: num_filterc3: ', num_filterc
-      write(iulog,*) 'ComputeRootFracVertSing: filterc3: ', filterc 
-      write(iulog,*) 'ComputeRootFracVertSing: num_filterc_tot3: ', num_filterc_tot
       if (use_hydrstress) then
          call Compute_EffecRootFrac_And_VertTranSink_HydStress(bounds, &
               num_filterc, filterc, waterfluxbulk_inst, soilstate_inst, &
@@ -156,7 +145,7 @@ contains
 
    subroutine Compute_EffecRootFrac_And_VertTranSink_HydStress_Roads(bounds, &
          num_filterc,filterc, soilstate_inst, waterfluxbulk_inst)
-      
+
       use SoilStateType    , only : soilstate_type
       use WaterFluxBulkType    , only : waterfluxbulk_type
       use clm_varpar       , only : nlevsoi
@@ -165,9 +154,9 @@ contains
       use ColumnType       , only : col
 
       ! Arguments
-      type(bounds_type)       , intent(in)    :: bounds      
+      type(bounds_type)       , intent(in)    :: bounds
       integer                 , intent(in)    :: num_filterc
-      integer                 , intent(in)    :: filterc(:) 
+      integer                 , intent(in)    :: filterc(:)
       type(soilstate_type)    , intent(inout) :: soilstate_inst
       type(waterfluxbulk_type)    , intent(inout) :: waterfluxbulk_inst
 
@@ -180,17 +169,17 @@ contains
       real(r8) :: temp(bounds%begc:bounds%endc)                         ! accumulator for rootr weighting
 
 
-      associate(& 
-            qflx_rootsoi_col    => waterfluxbulk_inst%qflx_rootsoi_col    , & ! Output: [real(r8) (:,:) ]  
+      associate(&
+            qflx_rootsoi_col    => waterfluxbulk_inst%qflx_rootsoi_col    , & ! Output: [real(r8) (:,:) ]
                                                                           ! vegetation/soil water exchange (mm H2O/s) (+ = to atm)
-            qflx_tran_veg_patch => waterfluxbulk_inst%qflx_tran_veg_patch , & ! Input:  [real(r8) (:)   ]  
-                                                                          ! vegetation transpiration (mm H2O/s) (+ = to atm) 
-            qflx_tran_veg_col   => waterfluxbulk_inst%qflx_tran_veg_col   , & ! Input:  [real(r8) (:)   ]  
+            qflx_tran_veg_patch => waterfluxbulk_inst%qflx_tran_veg_patch , & ! Input:  [real(r8) (:)   ]
                                                                           ! vegetation transpiration (mm H2O/s) (+ = to atm)
-            rootr_patch         => soilstate_inst%rootr_patch         , & ! Input:  [real(r8) (:,:) ]  
-                                                                          ! effective fraction of roots in each soil layer (SMS method only)  
-            rootr_col           => soilstate_inst%rootr_col             & ! Output: [real(r8) (:,:) ]  
-                                                                          !effective fraction of roots in each soil layer  
+            qflx_tran_veg_col   => waterfluxbulk_inst%qflx_tran_veg_col   , & ! Input:  [real(r8) (:)   ]
+                                                                          ! vegetation transpiration (mm H2O/s) (+ = to atm)
+            rootr_patch         => soilstate_inst%rootr_patch         , & ! Input:  [real(r8) (:,:) ]
+                                                                          ! effective fraction of roots in each soil layer (SMS method only)
+            rootr_col           => soilstate_inst%rootr_col             & ! Output: [real(r8) (:,:) ]
+                                                                          !effective fraction of roots in each soil layer
             )
 
         ! First step is to calculate the column-level effective rooting
@@ -199,9 +188,9 @@ contains
         ! weighted average of the PATCH level rootr arrays. Instead, the
         ! weighting depends on both the per-unit-area transpiration
         ! of the PATCH and the PATCHEs area relative to all PATCHES.
-        
+
         temp(bounds%begc : bounds%endc) = 0._r8
-    
+
 
         do j = 1, nlevsoi
            do fc = 1, num_filterc
@@ -209,7 +198,7 @@ contains
               rootr_col(c,j) = 0._r8
            end do
         end do
-        
+
         do pi = 1,max_patch_per_col
            do j = 1,nlevsoi
               do fc = 1, num_filterc
@@ -234,7 +223,7 @@ contains
            end do
         end do
 
-   
+
         do j = 1, nlevsoi
            do fc = 1, num_filterc
               c = filterc(fc)
@@ -247,9 +236,9 @@ contains
       end associate
       return
    end subroutine Compute_EffecRootFrac_And_VertTranSink_HydStress_Roads
-   
+
    ! ==================================================================================
-   
+
    subroutine Compute_EffecRootFrac_And_VertTranSink_HydStress( bounds, &
            num_filterc, filterc, waterfluxbulk_inst, soilstate_inst, &
            canopystate_inst, energyflux_inst)
@@ -287,35 +276,35 @@ contains
         real(r8) :: grav2                 ! soil layer gravitational potential relative to surface (mm H2O)
         real(r8) :: patchflux             ! patch level soil-to-plant water flux (mm/s)
         integer , parameter :: soil=1,root=4  ! index values
-        !-----------------------------------------------------------------------   
-        
+        !-----------------------------------------------------------------------
+
         associate(&
-              k_soil_root            => soilstate_inst%k_soil_root_patch         , & ! Input:  [real(r8) (:,:) ]  
+              k_soil_root            => soilstate_inst%k_soil_root_patch         , & ! Input:  [real(r8) (:,:) ]
                                                                             ! soil-root interface conductance (mm/s)
-              qflx_phs_neg_col       => waterfluxbulk_inst%qflx_phs_neg_col      , & ! Output:  [real(r8) (:)   ] 
+              qflx_phs_neg_col       => waterfluxbulk_inst%qflx_phs_neg_col      , & ! Output:  [real(r8) (:)   ]
                                                                             ! net neg hydraulic redistribution flux col (mm H2O/s)
-              qflx_hydr_redist_patch => waterfluxbulk_inst%qflx_hydr_redist_patch, & ! Output:  [real(r8) (:)   ] 
+              qflx_hydr_redist_patch => waterfluxbulk_inst%qflx_hydr_redist_patch, & ! Output:  [real(r8) (:)   ]
                                                                             ! net neg hydraulic redistribution flux patch (mm H2O/s)
-              qflx_tran_veg_col      => waterfluxbulk_inst%qflx_tran_veg_col     , & ! Input:  [real(r8) (:)   ]  
+              qflx_tran_veg_col      => waterfluxbulk_inst%qflx_tran_veg_col     , & ! Input:  [real(r8) (:)   ]
                                                                             ! vegetation transpiration (mm H2O/s) (+ = to atm)
-              qflx_tran_veg_patch    => waterfluxbulk_inst%qflx_tran_veg_patch   , & ! Input:  [real(r8) (:)   ]  
+              qflx_tran_veg_patch    => waterfluxbulk_inst%qflx_tran_veg_patch   , & ! Input:  [real(r8) (:)   ]
                                                                             ! vegetation transpiration (mm H2O/s) (+ = to atm)
               qflx_rootsoi_col       => waterfluxbulk_inst%qflx_rootsoi_col      , & ! Output: [real(r8) (:)   ]
-                                                                            ! col root and soil water 
+                                                                            ! col root and soil water
                                                                             ! exchange [mm H2O/s] [+ into root]
               smp                    => soilstate_inst%smp_l_col                 , & ! Input:  [real(r8) (:,:) ]  soil matrix pot. [mm]
-              frac_veg_nosno         => canopystate_inst%frac_veg_nosno_patch    , & ! Input:  [integer  (:)  ] 
-                                                                            ! fraction of vegetation not 
-                                                                            ! covered by snow (0 OR 1) [-]  
+              frac_veg_nosno         => canopystate_inst%frac_veg_nosno_patch    , & ! Input:  [integer  (:)  ]
+                                                                            ! fraction of vegetation not
+                                                                            ! covered by snow (0 OR 1) [-]
               z                      => col%z                                    , & ! Input: [real(r8) (:,:) ]  layer node depth (m)
-              vegwp                  => canopystate_inst%vegwp_patch               & ! Input: [real(r8) (:,:) ]  vegetation water 
+              vegwp                  => canopystate_inst%vegwp_patch               & ! Input: [real(r8) (:,:) ]  vegetation water
                                                                             ! matric potential (mm)
               )
-          
+
           do fc = 1, num_filterc
              c = filterc(fc)
              qflx_phs_neg_col(c) = 0._r8
-             
+
              do j = 1, nlevsoi
                 grav2 = z(c,j) * 1000._r8
                 temp(c) = 0._r8
@@ -325,7 +314,7 @@ contains
                       if (j == 1) then
                          qflx_hydr_redist_patch(p) = 0._r8
                       end if
-                      if (patch%active(p).and.frac_veg_nosno(p)>0) then 
+                      if (patch%active(p).and.frac_veg_nosno(p)>0) then
                          if (patch%wtcol(p) > 0._r8) then
                             patchflux = k_soil_root(p,j) * (smp(c,j) - vegwp(p,4) - grav2)
                             if (patchflux <0) then
@@ -337,17 +326,17 @@ contains
                    end if
                 end do
                 qflx_rootsoi_col(c,j)= temp(c)
-                
+
                 if (temp(c) < 0._r8) qflx_phs_neg_col(c) = qflx_phs_neg_col(c) + temp(c)
              end do
-             
+
           end do
-          
+
         end associate
 
         return
      end subroutine Compute_EffecRootFrac_And_VertTranSink_HydStress
-     
+
      ! ==================================================================================
 
      subroutine Compute_EffecRootFrac_And_VertTranSink_Default(bounds, num_filterc, &
@@ -381,74 +370,59 @@ contains
     integer  :: p,c,fc,j                                              ! do loop indices
     integer  :: pi                                                    ! patch index
     real(r8) :: temp(bounds%begc:bounds%endc)                         ! accumulator for rootr weighting
-    associate(& 
-          qflx_rootsoi_col    => waterfluxbulk_inst%qflx_rootsoi_col    , & ! Output: [real(r8) (:,:) ]  
+    associate(&
+          qflx_rootsoi_col    => waterfluxbulk_inst%qflx_rootsoi_col    , & ! Output: [real(r8) (:,:) ]
                                                                         ! vegetation/soil water exchange (m H2O/s) (+ = to atm)
-          qflx_tran_veg_patch => waterfluxbulk_inst%qflx_tran_veg_patch , & ! Input:  [real(r8) (:)   ]  
-                                                                        ! vegetation transpiration (mm H2O/s) (+ = to atm) 
-          qflx_tran_veg_col   => waterfluxbulk_inst%qflx_tran_veg_col   , & ! Input:  [real(r8) (:)   ]  
+          qflx_tran_veg_patch => waterfluxbulk_inst%qflx_tran_veg_patch , & ! Input:  [real(r8) (:)   ]
+                                                                        ! vegetation transpiration (mm H2O/s) (+ = to atm)
+          qflx_tran_veg_col   => waterfluxbulk_inst%qflx_tran_veg_col   , & ! Input:  [real(r8) (:)   ]
                                                                         ! vegetation transpiration (mm H2O/s) (+ = to atm)
           rootr_patch         => soilstate_inst%rootr_patch         , & ! Input: [real(r8) (:,:) ]
-                                                                        ! effective fraction of roots in each soil layer (SMS method only) 
-          rootr_col           => soilstate_inst%rootr_col             & ! Output: [real(r8) (:,:) ]  
-                                                                        ! effective fraction of roots in each soil layer  
+                                                                        ! effective fraction of roots in each soil layer (SMS method only)
+          rootr_col           => soilstate_inst%rootr_col             & ! Output: [real(r8) (:,:) ]
+                                                                        ! effective fraction of roots in each soil layer
           )
-      
+
       ! First step is to calculate the column-level effective rooting
       ! fraction in each soil layer. This is done outside the usual
       ! PATCH-to-column averaging routines because it is not a simple
       ! weighted average of the PATCH level rootr arrays. Instead, the
       ! weighting depends on both the per-unit-area transpiration
       ! of the PATCH and the PATCHEs area relative to all PATCHES.
-      
+
       temp(bounds%begc : bounds%endc) = 0._r8
-      
+
       do j = 1, nlevsoi
          do fc = 1, num_filterc
             c = filterc(fc)
             rootr_col(c,j) = 0._r8
          end do
       end do
-      
+
       do pi = 1,max_patch_per_col
-         write(iulog,*) 'ComputeRootFracVertSing: part 1'
          do j = 1,nlevsoi
             do fc = 1, num_filterc
                c = filterc(fc)
-               write(iulog,*) 'ComputeRootFracVertSing: pi,c, col%npatches(c) 1: ', pi,c, col%npatches(c)
                if (pi <= col%npatches(c)) then
                   p = col%patchi(c) + pi - 1
-                  write(iulog,*) 'ComputeRootFracVertSing: pi,c,p,patch%active(p) 1: ', pi,c,p,patch%active(p)
                   if (patch%active(p)) then
                      rootr_col(c,j) = rootr_col(c,j) + rootr_patch(p,j) * &
                            qflx_tran_veg_patch(p) * patch%wtcol(p)
-                     write(iulog,*) 'ComputeRootFracVertSing: pi,j,fc,c,p 1: ', pi,j,fc,c,p
-                     write(iulog,*) 'ComputeRootFracVertSing: rootr_col(c,j) 1: ', rootr_col(c,j)
-                     write(iulog,*) 'ComputeRootFracVertSing: rootr_patch(c,j) 1: ', rootr_patch(c,j)
-                     write(iulog,*) 'ComputeRootFracVertSing: qflx_tran_veg_patch(p) 1: ', qflx_tran_veg_patch(p) 
-                     write(iulog,*) 'ComputeRootFracVertSing: patch%wtcol(p) 1: ', patch%wtcol(p) 
                   end if
                end if
             end do
          end do
-         write(iulog,*) 'ComputeRootFracVertSing: part 2'
          do fc = 1, num_filterc
             c = filterc(fc)
-            write(iulog,*) 'ComputeRootFracVertSing: pi,c, col%npatches(c) 2: ', pi,c, col%npatches(c)
             if (pi <= col%npatches(c)) then
                p = col%patchi(c) + pi - 1
-               write(iulog,*) 'ComputeRootFracVertSing: pi,c,p,patch%active(p) 2: ', pi,c,p,patch%active(p)
                if (patch%active(p)) then
                   temp(c) = temp(c) + qflx_tran_veg_patch(p) * patch%wtcol(p)
-                  write(iulog,*) 'ComputeRootFracVertSing: pi,fc,c,p 2: ', pi,fc,c,p
-                  write(iulog,*) 'ComputeRootFracVertSing: qflx_tran_veg_patch(p) 2: ', qflx_tran_veg_patch(p) 
-                  write(iulog,*) 'ComputeRootFracVertSing: patch%wtcol(p) 2: ', patch%wtcol(p) 
                end if
             end if
          end do
       end do
-      
-      write(iulog,*) 'ComputeRootFracVertSing: part 3'
+
       do j = 1, nlevsoi
          do fc = 1, num_filterc
             c = filterc(fc)
@@ -456,9 +430,6 @@ contains
                rootr_col(c,j) = rootr_col(c,j)/temp(c)
             end if
             qflx_rootsoi_col(c,j) = rootr_col(c,j)*qflx_tran_veg_col(c)
-            write(iulog,*) 'ComputeRootFracVertSing: j,fc,c 3: ', j,fc,c
-            write(iulog,*) 'ComputeRootFracVertSing: rootr_col(c,j) 3: ', rootr_col(c,j)
-            write(iulog,*) 'ComputeRootFracVertSing: qflx_tran_veg_col(c) 3: ', qflx_tran_veg_col(c) 
 
          end do
       end do

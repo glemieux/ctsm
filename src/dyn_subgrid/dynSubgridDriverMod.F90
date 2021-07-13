@@ -35,7 +35,7 @@ module dynSubgridDriverMod
   use ch4Mod,                        only : ch4_type
   use EnergyFluxType               , only : energyflux_type
   use PhotosynthesisMod            , only : photosyns_type
-  use SoilHydrologyType            , only : soilhydrology_type  
+  use SoilHydrologyType            , only : soilhydrology_type
   use SoilStateType                , only : soilstate_type
   use WaterType                    , only : water_type
   use LakestateType                , only : lakestate_type
@@ -79,7 +79,7 @@ contains
     ! or any other run that starts up from initial conditions (except startup runs that
     ! use init_interp).
     !
-    ! This should be called from initialization, after dynSubgridControl is initialized. 
+    ! This should be called from initialization, after dynSubgridControl is initialized.
     !
     ! Note that dynpft_init needs to be called from outside any loops over clumps - so
     ! this routine needs to be called from outside any loops over clumps.
@@ -109,13 +109,11 @@ contains
 
     ! Initialize stuff for prescribed transient Patches
     if (get_do_transient_pfts()) then
-       write(iulog,*) trim(subname), ': dynpft_interp'
        call dynpft_init(bounds_proc, dynpft_filename=get_flanduse_timeseries())
     end if
 
     ! Initialize stuff for prescribed transient crops
     if (get_do_transient_crops()) then
-       write(iulog,*) trim(subname), ': dyncrop_interp'
        call dyncrop_init(bounds_proc, dyncrop_filename=get_flanduse_timeseries())
     end if
 
@@ -124,38 +122,33 @@ contains
     ! harvest data were separated from the pftdyn data, allowing them to differ in the
     ! years over which they apply.
     if (get_do_harvest()) then
-       write(iulog,*) trim(subname), ': dynHarvest_interp'
        call dynHarvest_init(bounds_proc, harvest_filename=get_flanduse_timeseries())
     end if
 
-    
+
     ! Initialize stuff for prescribed transient lakes
     if (get_do_transient_lakes()) then
-       write(iulog,*) trim(subname), ': dynlake_interp'
         call dynlake_init(bounds_proc, dynlake_filename=get_flanduse_timeseries())
     end if
-    
+
     ! ------------------------------------------------------------------------
     ! Set initial subgrid weights for aspects that are read from file. This is relevant
     ! for cold start and use_init_interp-based initialization.
     ! ------------------------------------------------------------------------
 
     if (get_do_transient_pfts()) then
-       write(iulog,*) trim(subname), ': dynpft_interp'
        call dynpft_interp(bounds_proc)
     end if
 
     if (get_do_transient_crops()) then
-       write(iulog,*) trim(subname), ': dyncrop_interp'
        call dyncrop_interp(bounds_proc, crop_inst)
     end if
 
     if (get_do_transient_lakes()) then
-       write(iulog,*) trim(subname), ': dynlake_interp'
        call dynlake_interp(bounds_proc)
     end if
-    
-    
+
+
     ! (We don't bother calling dynHarvest_interp, because the harvest information isn't
     ! needed until the run loop. Harvest has nothing to do with subgrid weights, and in
     ! some respects doesn't even really belong in this module at all.)
@@ -166,8 +159,6 @@ contains
     !$OMP PARALLEL DO PRIVATE (nc, bounds_clump)
     do nc = 1, nclumps
        call get_clump_bounds(nc, bounds_clump)
-
-       write(iulog,*) trim(subname), ': dynSubgrid_wrapup_weight_changes '
        call dynSubgrid_wrapup_weight_changes(bounds_clump, glc_behavior)
     end do
     !$OMP END PARALLEL DO
@@ -259,22 +250,18 @@ contains
     ! ==========================================================================
 
     if (get_do_transient_pfts()) then
-       write(iulog,*) trim(subname), ': dynpft_interp'
        call dynpft_interp(bounds_proc)
     end if
 
     if (get_do_transient_crops()) then
-       write(iulog,*) trim(subname), ': dyncrop_interp'
        call dyncrop_interp(bounds_proc,crop_inst)
     end if
 
     if (get_do_harvest() .and. .not. use_fates) then
-       write(iulog,*) trim(subname), ': dynHarvest_interp'
        call dynHarvest_interp(bounds_proc)
     end if
-	
+
     if (get_do_transient_lakes()) then
-       write(iulog,*) trim(subname), ': dynlake_interp'
        call dynlake_interp(bounds_proc)
     end if
     ! ==========================================================================
@@ -286,7 +273,7 @@ contains
        call get_clump_bounds(nc, bounds_clump)
 
        call bgc_vegetation_inst%UpdateSubgridWeights(bounds_clump)
-       
+
        if (use_fates) then
           call dyn_ED(bounds_clump)
        end if

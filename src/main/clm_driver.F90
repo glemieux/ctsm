@@ -748,7 +748,6 @@ contains
           ! on btran, so it could be moved earlier in the driver loop - possibly even
           ! immediately before ApplyIrrigation, which would be a more clear place to put it.
 
-          write(iulog,*) 'clm_drv: pre-CalcIrrigationNeeded: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
           call t_startf('irrigationneeded')
           call irrigation_inst%CalcIrrigationNeeded( &
                bounds             = bounds_clump, &
@@ -762,7 +761,6 @@ contains
                volr               = water_inst%wateratm2lndbulk_inst%volrmch_grc(bounds_clump%begg:bounds_clump%endg), &
                rof_prognostic     = rof_prognostic)
           call t_stopf('irrigationneeded')
-          write(iulog,*) 'clm_drv: post-CalcIrrigationNeeded: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        end if
 
@@ -847,8 +845,6 @@ contains
        call clm_drv_patch2col(bounds_clump, &
             filter(nc)%num_allc, filter(nc)%allc, filter(nc)%num_nolakec, filter(nc)%nolakec, &
             energyflux_inst, water_inst%waterfluxbulk_inst)
-       write(iulog,*) 'clm_drv: clm_drv_patch2col: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
-       write(iulog,*) 'clm_drv: clm_drv_patch2col: ', water_inst%waterstatebulk_inst%h2osoi_liq_col
        call t_stopf('patch2col')
 
        ! ============================================================================
@@ -872,7 +868,6 @@ contains
             saturated_excess_runoff_inst, &
             infiltration_excess_runoff_inst, &
             aerosol_inst, canopystate_inst, scf_method, soil_water_retention_curve, topo_inst)
-       write(iulog,*) 'clm_drv: HydrologyNoDrainage: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        ! The following needs to be done after HydrologyNoDrainage (because it needs
        ! waterfluxbulk_inst%qflx_snwcp_ice_col), but before HydrologyDrainage (because
@@ -915,7 +910,6 @@ contains
             scf_method, water_inst, &
             atm2lnd_inst, temperature_inst, soilstate_inst, &
             energyflux_inst, aerosol_inst, lakestate_inst, topo_inst)
-       write(iulog,*) 'clm_drv: LakeHydrology: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        !  Calculate column-integrated aerosol masses, and
        !  mass concentrations for radiative calculations and output
@@ -1042,7 +1036,6 @@ contains
             water_inst%waterdiagnosticbulk_inst, water_inst%waterbalancebulk_inst, &
             water_inst%waterfluxbulk_inst, water_inst%wateratm2lndbulk_inst, &
             glacier_smb_inst)
-            write(iulog,*) 'clm_drv: HydrologyDrainage: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
        call t_stopf('hydro2_drainage')
 
@@ -1111,7 +1104,6 @@ contains
                   water_inst%waterstatebulk_inst, water_inst%waterdiagnosticbulk_inst, &
                   water_inst%wateratm2lndbulk_inst, canopystate_inst, soilbiogeochem_carbonflux_inst, &
                   frictionvel_inst)
-             write(iulog,*) 'clm_drv: clm_fates%dynamics_driv: ', water_inst%waterstatebulk_inst%h2osoi_vol_col
 
              ! TODO(wjs, 2016-04-01) I think this setFilters call should be replaced by a
              ! call to reweight_wrapup, if it's needed at all.
@@ -1136,7 +1128,6 @@ contains
 
        if (use_cn) then
           call t_startf('cnbalchk')
-          write(iulog,*) 'clm_drv: pre-bgc_veg balance check'
           call bgc_vegetation_inst%BalanceCheck( &
                bounds_clump, filter(nc)%num_soilc, filter(nc)%soilc, &
                soilbiogeochem_carbonflux_inst, &
@@ -1297,7 +1288,6 @@ contains
             filter(nc)%num_lakec, filter(nc)%lakec, &
             water_inst, lakestate_inst, &
             use_aquifer_layer = use_aquifer_layer(), flag = 'endwb')
-       write(iulog,*) 'clm_drv: post water grid cell balance check'
        call BalanceCheck(bounds_clump, &
             filter(nc)%num_allc, filter(nc)%allc, &
             atm2lnd_inst, solarabs_inst, water_inst%waterfluxbulk_inst, &
@@ -1400,7 +1390,6 @@ contains
        ! Create history and write history tapes if appropriate
        call t_startf('clm_drv_io_htapes')
 
-       write(iulog,*) 'clm_drv: calling hist_htapes_wrapup'
        call hist_htapes_wrapup( rstwr, nlend, bounds_proc,                    &
             soilstate_inst%watsat_col(bounds_proc%begc:bounds_proc%endc, 1:), &
             soilstate_inst%sucsat_col(bounds_proc%begc:bounds_proc%endc, 1:), &
