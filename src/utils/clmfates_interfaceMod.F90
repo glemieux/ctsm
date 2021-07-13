@@ -2156,9 +2156,6 @@ module CLMFatesInterfaceMod
          do ifp = 1,this%fates(nc)%sites(s)%youngest_patch%patchno
            p = ifp+col%patchi(c)
 
-          write(iulog,*) 'wraprad: s,c,p,ifp: ',s,c,p,ifp
-          write(iulog,*) 'wraprad: filter_vegsol: ', filter_vegsol
-
           if( any(filter_vegsol==p) )then
 
              this%fates(nc)%bc_in(s)%filter_vegzen_pa(ifp) = .true.
@@ -2729,7 +2726,6 @@ module CLMFatesInterfaceMod
 
        ! This is the water removed from the soil layers by roots (or added)
        waterfluxbulk_inst%qflx_rootsoi_col(c,1:nlevsoil) = this%fates(nc)%bc_out(s)%qflx_soil2root_sisl(1:nlevsoil)
-       write(iulog,*) 'ComputeRootSoilFlux: waterfluxbulk_inst%qflx_rootsoi_col: ', waterfluxbulk_inst%qflx_rootsoi_col(c,1:nlevsoil)
 
        ! This is the total amount of water transferred to surface runoff
        ! (this is generated potentially from supersaturating soils
