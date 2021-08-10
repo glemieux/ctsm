@@ -625,6 +625,8 @@ module CLMFatesInterfaceMod
                else 
                   this%fates(nc)%bc_in(s)%pft_areafrac(ft)=0._r8
                end if
+               write(iulog,*) 'clmfates: nc,s,g,m,ft: ',nc,s,g,m,ft
+               write(iulog,*) 'clmfates: wt_nat_patch: ', wt_nat_patch
             end do
 
           end do !site
