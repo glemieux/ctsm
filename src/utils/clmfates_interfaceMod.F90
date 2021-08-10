@@ -640,6 +640,8 @@ module CLMFatesInterfaceMod
             do m = natpft_lb,natpft_ub
                ft = m-natpft_lb
                this%fates(nc)%bc_in(s)%pft_areafrac(ft)=wt_nat_patch(g,m)
+               write(iulog,*) 'clmfates: nc,s,g,m,ft: ',nc,s,g,m,ft
+               write(iulog,*) 'clmfates: wt_nat_patch: ', wt_nat_patch
             end do
 
             if(abs(sum(this%fates(nc)%bc_in(s)%pft_areafrac(natpft_lb:natpft_ub))-1.0_r8).gt.1.0e-9)then
