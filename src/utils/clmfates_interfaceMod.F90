@@ -637,8 +637,8 @@ module CLMFatesInterfaceMod
             this%fates(nc)%bc_in(s)%pft_areafrac(:)=0._r8
             ! initialize static layers for reduced complexity FATES versions from HLM
             ! maybe make this into a subroutine of it's own later.
-            do m = natpft_lb,natpft_ub
-               ft = m-natpft_lb
+            do m = natpft_lb,natpft_ub-1
+               ft = m-natpft_lb+1
                this%fates(nc)%bc_in(s)%pft_areafrac(ft)=wt_nat_patch(g,m)
                write(iulog,*) 'clmfates: nc,s,g,m,ft: ',nc,s,g,m,ft
                write(iulog,*) 'clmfates: wt_nat_patch: ', wt_nat_patch
