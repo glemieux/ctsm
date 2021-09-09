@@ -130,7 +130,7 @@ contains
     !
     ! !LOCAL VARIABLES:
     integer              :: nstep                   ! time step number
-    integer              :: nc, c, p, l, g          ! indices
+    integer              :: nc, c, p, l, g, s          ! indices
     integer              :: nclumps                 ! number of clumps on this processor
     integer              :: yr                      ! year (0, ...)
     integer              :: mon                     ! month (1, ..., 12)
@@ -1092,6 +1092,14 @@ contains
                 c14_soilbiogeochem_carbonflux_inst, c14_soilbiogeochem_carbonstate_inst, &
                 soilbiogeochem_nitrogenflux_inst, soilbiogeochem_nitrogenstate_inst,     &
                 clm_fates, nc)
+
+          if(use_fates_sp)then
+          do s = 1,clm_fates%fates(nc)%nsites
+               c = clm_fates%f2hmap(nc)%fcolumn(s)
+                    clm_fates%fates(nc)%bc_in(s)%hlm_sp_tlai = 1.0
+               end do ! c
+          end if ! SP
+
 
           call clm_fates%wrap_update_hifrq_hist(bounds_clump, &
                soilbiogeochem_carbonflux_inst, &
