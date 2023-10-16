@@ -9,12 +9,14 @@ module dynFATESLandUseChangeMod
   ! !USES:
   use shr_kind_mod          , only : r8 => shr_kind_r8
   use shr_log_mod           , only : errMsg => shr_log_errMsg
+  use spmdMod               , only : masterproc
   use decompMod             , only : bounds_type, BOUNDS_LEVEL_PROC
   use abortutils            , only : endrun
   use dynFileMod            , only : dyn_file_type
   use dynVarTimeUninterpMod , only : dyn_var_time_uninterp_type
   use clm_varcon            , only : grlnd
   use clm_varctl            , only : iulog
+  use FatesInterfaceTypesMod, only : numpft_fates => numpft
 
   implicit none
 
@@ -22,13 +24,25 @@ module dynFATESLandUseChangeMod
 
   real(r8), allocatable, public :: landuse_transitions(:,:)
   real(r8), allocatable, public :: landuse_states(:,:)
+  real(r8), allocatable, public :: landuse_pft_map(:,:,:)
+  real(r8), allocatable, public :: landuse_bareground(:)
 
   integer, public, parameter    :: num_landuse_transition_vars = 108
   integer, public, parameter    :: num_landuse_state_vars = 12
+  integer, public, parameter    :: num_landuse_pft_vars = 5
+
+  integer, parameter            :: idprimary = 1
+  integer, parameter            :: idsecondary = 2
+  integer, parameter            :: idpasture = 3
+  integer, parameter            :: idrange = 4
+  integer, parameter            :: idcurrentsurface = 5
 
   type(dyn_file_type), target   :: dynFatesLandUse_file
 
   ! Land use name arrays
+  character(len=10), public, parameter  :: landuse_pft_map_varnames(num_landuse_pft_vars) = &
+                    [character(len=10)  :: 'frac_primr','frac_secnd','frac_pastr','frac_range','frac_csurf']
+
   character(len=5), public, parameter  :: landuse_state_varnames(num_landuse_state_vars) = &
                     [character(len=5)  :: 'primf','primn','secdf','secdn','pastr','range', &
                                           'urban','c3ann','c4ann','c3per','c4per','c3nfx']
@@ -68,7 +82,7 @@ module dynFATESLandUseChangeMod
 contains
 
   !-----------------------------------------------------------------------
-  subroutine dynFatesLandUseInit(bounds, landuse_filename)
+  subroutine dynFatesLandUseInit(bounds, landuse_filename, landuse_pft_filename)
 
     ! !DESCRIPTION:
     ! Initialize data structures for land use information.
@@ -82,6 +96,7 @@ contains
     ! !ARGUMENTS:
     type(bounds_type), intent(in) :: bounds        ! proc-level bounds
     character(len=*) , intent(in) :: landuse_filename  ! name of file containing land use information
+    character(len=*) , intent(in) :: landuse_pft_filename  ! name of file containing static landuse x pft information
 
     ! !LOCAL VARIABLES
     integer :: varnum, i      ! counter for harvest variables
@@ -106,9 +121,19 @@ contains
     if (ier /= 0) then
        call endrun(msg=' allocation error for landuse_transitions'//errMsg(__FILE__, __LINE__))
     end if
+      allocate(landuse_pft_map(num_landuse_pft_vars,numpft_fates,bounds%begg:bounds%endg),stat=ier)
+    if (ier /= 0) then
+       call endrun(msg=' allocation error for landuse_pft_map'//errMsg(__FILE__, __LINE__))
+    end if
+    allocate(landuse_bareground(bounds%begg:bounds%endg),stat=ier)
+    if (ier /= 0) then
+       call endrun(msg=' allocation error for landuse_bareground'//errMsg(__FILE__, __LINE__))
+    end if
 
+    ! Initialize the states, transitions and mapping percentages as zero by defaut
     landuse_states = 0._r8
     landuse_transitions = 0._r8
+    landuse_pft_map = 0._r8      ! TODO: make unset by default instead?
 
     if (use_fates_luh) then
 
@@ -132,6 +157,12 @@ contains
                dim1name=grlnd, conversion_factor=1.0_r8, &
                do_check_sums_equal_1=.false., data_shape=landuse_shape)
        end do
+
+       ! If fates is in no competition mode, read in landuse x pft static data
+       ! TODO: update this logic elsewhere to set use_fates_potential_vegetation
+       if (landuse_pft_filename /= '') call GetLandusePFTData(bounds, landuse_pft_filename)
+       ! if (use_fates_potential_vegetation) call GetLandusePFTData(bounds, landuse_pft_filename)
+
     end if
 
     ! Since fates needs state data during initialization, make sure to call
@@ -190,5 +221,79 @@ contains
     end if
 
   end subroutine dynFatesLandUseInterp
+
+!-----------------------------------------------------------------------
+  subroutine GetLandusePFTData(bounds, landuse_pft_file)
+
+    ! !DESCRIPTION:
+    ! If fates is in no competition mode with landuse on, read in the
+    ! static landuse x pft file
+
+    ! !USES:
+    use fileutils, only : getfil
+    use ncdio_pio, only : file_desc_t, ncd_io, ncd_pio_openfile, ncd_pio_closefile
+
+    ! !ARGUMENTS:
+    type(bounds_type), intent(in) :: bounds                ! proc-level bounds
+    character(len=*) , intent(in) :: landuse_pft_file      ! name of file containing static landuse x pft information
+
+    ! !LOCAL VARIABLES
+    integer            :: varnum
+    character(len=256) :: locfn                     ! local file name
+    type(file_desc_t)  :: ncid                      ! netcdf id
+    real(r8), pointer  :: arraylocal(:,:)           ! local array
+    real(r8), pointer  :: arraylocal_bareground(:)  ! local array
+    logical            :: readvar                   ! true => variable is on dataset
+
+    character(len=*), parameter :: subname = 'GetLandusePFTFile'
+    !-----------------------------------------------------------------------
+
+    SHR_ASSERT_ALL(bounds%level == BOUNDS_LEVEL_PROC, subname // ': argument must be PROC-level bounds')
+
+    ! Check to see if the landuse file name has been provided
+    ! Note: getfile checks this as well
+    if (masterproc) then
+       write(iulog,*) 'Attempting to read landuse x pft data .....'
+       if (landuse_pft_file == ' ') then
+          write(iulog,*)'landuse_pft_file must be specified'
+          call endrun(msg=errMsg(__FILE__, __LINE__))
+       endif
+    endif
+
+    ! Get the local filename and open the file
+    call getfil(landuse_pft_file, locfn, 0)
+    call ncd_pio_openfile (ncid, trim(locfn), 0)
+
+    ! TODO: Check that expected variables are on the file?
+    ! TODO: Check that dimensions are correct?
+
+    ! Allocate a temporary array since ncdio expects a pointer
+    allocate(arraylocal(numpft_fates,bounds%begg:bounds%endg))
+    allocate(arraylocal_bareground(bounds%begg:bounds%endg))
+
+    ! Read the landuse x pft data from file
+    do varnum = 1, num_landuse_pft_vars
+       call ncd_io(ncid=ncid, varname=landuse_pft_map_varnames(varnum), flag='read', &
+                   data=arraylocal, dim1name=grlnd, readvar=readvar)
+       if (.not. readvar) &
+          call endrun(msg='ERROR: '//trim(landuse_pft_map_varnames(varnum))// &
+                          ' NOT on landuse x pft file'//errMsg(__FILE__, __LINE__))
+       landuse_pft_map(varnum,:,bounds%begg:bounds%endg) = arraylocal(:,bounds%begg:bounds%endg)
+    end do
+
+    ! Read the bareground data from file.  This is per gridcell only.
+    call ncd_io(ncid=ncid, varname='frac_brgnd', flag='read', data=arraylocal_bareground, &
+         dim1name=grlnd, readvar=readvar)
+    if (.not. readvar) call endrun(msg='ERROR: frac_brgnd NOT on landuse x pft file'//errMsg(__FILE__, __LINE__))
+    landuse_bareground(bounds%begg:bounds%endg) = arraylocal_bareground(bounds%begg:bounds%endg)
+
+    ! Deallocate the temporary local array point and close the file
+    deallocate(arraylocal)
+    deallocate(arraylocal_bareground)
+    call ncd_pio_closefile(ncid)
+
+    ! Check that sums equal to unity
+
+  end subroutine GetLandusePFTData
 
 end module dynFATESLandUseChangeMod

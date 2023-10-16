@@ -142,7 +142,7 @@ contains
     use decompInitMod                 , only : decompInit_clumps, decompInit_glcp
     use domainMod                     , only : domain_check, ldomain, domain_init
     use surfrdMod                     , only : surfrd_get_data
-    use controlMod                    , only : NLFilename, fluh_timeseries
+    use controlMod                    , only : NLFilename, fluh_timeseries, flandusepftdat
     use initGridCellsMod              , only : initGridCells
     use ch4varcon                     , only : ch4conrd
     use UrbanParamsType               , only : UrbanInput, IsSimpleBuildTemp
@@ -409,7 +409,7 @@ contains
 
     ! Initialize fates LUH2 usage
     if (use_fates_luh) then
-       call dynFatesLandUseInit(bounds_proc, fluh_timeseries)
+       call dynFatesLandUseInit(bounds_proc, fluh_timeseries, flandusepft)
     end if
 
     ! Initialize baseline water and energy states needed for dynamic subgrid operation

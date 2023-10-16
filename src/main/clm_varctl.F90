@@ -271,6 +271,7 @@ module clm_varctl
   logical, public            :: use_fates_nocomp = .false.              ! true => use no comopetition mode
   logical, public            :: use_fates_luh = .false.                 ! true => use FATES satellite phenology mode
   character(len=256), public :: fluh_timeseries = ''                    ! filename for inventory control
+  character(len=256), public :: flandusepftdat = ''                     ! filename for fates landuse x pft data
   character(len=256), public :: fates_inventory_ctrl_filename = ''      ! filename for inventory control
 
   ! FATES SP AND FATES BGC are MUTUTALLY EXCLUSIVE, THEY CAN'T BOTH BE ON
