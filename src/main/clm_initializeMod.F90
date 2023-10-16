@@ -409,7 +409,7 @@ contains
 
     ! Initialize fates LUH2 usage
     if (use_fates_luh) then
-       call dynFatesLandUseInit(bounds_proc, fluh_timeseries, flandusepft)
+       call dynFatesLandUseInit(bounds_proc, fluh_timeseries, flandusepftdat)
     end if
 
     ! Initialize baseline water and energy states needed for dynamic subgrid operation
