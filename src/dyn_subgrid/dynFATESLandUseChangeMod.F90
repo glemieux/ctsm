@@ -46,31 +46,6 @@ module dynFATESLandUseChangeMod
                                           'urban','c3ann','c4ann','c3per','c4per','c3nfx']
 
   character(len=14), public, parameter, allocatable :: landuse_transition_varnames(:)
-  !character(len=14), public, parameter :: landuse_transition_varnames(num_landuse_transition_vars) = &
-  !                  [character(len=14) :: 'primf_to_secdn','primf_to_pastr','primf_to_range','primf_to_urban', &
-  !                                        'primf_to_c3ann','primf_to_c4ann','primf_to_c3per','primf_to_c4per','primf_to_c3nfx', &
-  !                                        'primn_to_secdf','primn_to_pastr','primn_to_range','primn_to_urban', &
-  !                                        'primn_to_c3ann','primn_to_c4ann','primn_to_c3per','primn_to_c4per','primn_to_c3nfx', &
-  !                                        'secdf_to_secdn','secdf_to_pastr','secdf_to_range','secdf_to_urban', &
-  !                                        'secdf_to_c3ann','secdf_to_c4ann','secdf_to_c3per','secdf_to_c4per','secdf_to_c3nfx', &
-  !                                        'secdn_to_secdf','secdn_to_pastr','secdn_to_range','secdn_to_urban', &
-  !                                        'secdn_to_c3ann','secdn_to_c4ann','secdn_to_c3per','secdn_to_c4per','secdn_to_c3nfx', &
-  !                                        'pastr_to_secdf','pastr_to_secdn','pastr_to_range','pastr_to_urban', &
-  !                                        'pastr_to_c3ann','pastr_to_c4ann','pastr_to_c3per','pastr_to_c4per','pastr_to_c3nfx', &
-  !                                        'range_to_secdf','range_to_secdn','range_to_pastr','range_to_urban', &
-  !                                        'range_to_c3ann','range_to_c4ann','range_to_c3per','range_to_c4per','range_to_c3nfx', &
-  !                                        'urban_to_secdf','urban_to_secdn','urban_to_pastr','urban_to_range', &
-  !                                        'urban_to_c3ann','urban_to_c4ann','urban_to_c3per','urban_to_c4per','urban_to_c3nfx', &
-  !                                        'c3ann_to_c4ann','c3ann_to_c3per','c3ann_to_c4per','c3ann_to_c3nfx', &
-  !                                        'c3ann_to_secdf','c3ann_to_secdn','c3ann_to_pastr','c3ann_to_range','c3ann_to_urban', &
-  !                                        'c4ann_to_c3ann','c4ann_to_c3per','c4ann_to_c4per','c4ann_to_c3nfx', &
-  !                                        'c4ann_to_secdf','c4ann_to_secdn','c4ann_to_pastr','c4ann_to_range','c4ann_to_urban', &
-  !                                        'c3per_to_c3ann','c3per_to_c4ann','c3per_to_c4per','c3per_to_c3nfx', &
-  !                                        'c3per_to_secdf','c3per_to_secdn','c3per_to_pastr','c3per_to_range','c3per_to_urban', &
-  !                                        'c4per_to_c3ann','c4per_to_c4ann','c4per_to_c3per','c4per_to_c3nfx', &
-  !                                        'c4per_to_secdf','c4per_to_secdn','c4per_to_pastr','c4per_to_range','c4per_to_urban', &
-  !                                        'c3nfx_to_c3ann','c3nfx_to_c4ann','c3nfx_to_c3per','c3nfx_to_c4per', &
-  !                                        'c3nfx_to_secdf','c3nfx_to_secdn','c3nfx_to_pastr','c3nfx_to_range','c3nfx_to_urban']
 
   type(dyn_var_time_uninterp_type) :: landuse_transition_vars(num_landuse_transition_vars) ! value of each landuse variable
   type(dyn_var_time_uninterp_type) :: landuse_state_vars(num_landuse_state_vars)           ! value of each landuse variable
@@ -141,13 +116,13 @@ contains
           tempvarname = trim(landuse_state_varnames(j))
 
           ! Avoid self transitions or transitions into 'primf' or 'primn'
-          if (not(i == j .or. tempvarname(1:4) == 'prim') ) then
+          if (.not. (i == j .or. tempvarname(1:4) == 'prim') ) then
 
              ! Build the transition name
              tempvarname = trim(landuse_state_varnames(i))//'_to_'//trim(landuse_state_varnames(j))
 
              ! 'primf' and 'primn' transition rultes to avoid
-             if (not(tempvarname == 'primf_to_secdf' .or. tempvarname == 'primn_to_secdn')) then
+             if (.not. (tempvarname == 'primf_to_secdf' .or. tempvarname == 'primn_to_secdn')) then
                 landuse_transition_varnames(iter) = tempvarname
                 iter = iter + 1
              end if
