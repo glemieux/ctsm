@@ -26,9 +26,16 @@ module dynFATESLandUseChangeMod
   ! Landuse state at beginning of year (fraction of gridcell), landuse state name x gridcell
   real(r8), allocatable, public :: landuse_states(:,:)
 
-  ! Number of landuse transition and state names
-  integer, public, parameter    :: num_landuse_transition_vars = 108
+  ! Number of landuse state names
   integer, public, parameter    :: num_landuse_state_vars = 12
+
+  ! The number of landuse transition variable names is based on the number of states.
+  ! There are nine transitions for each landuse state name for a total of 12 x 9 = 108 transitions
+  ! based on the following rules:
+  ! - No state transitions into 'primf' or 'primn'
+  ! - 'primf' does not transition into 'secdf'
+  ! - 'primn' does not transition into 'secdn'
+  integer, public, parameter    :: num_landuse_transition_vars = num_landuse_state_vars * (num_landuse_state_vars-3)
 
   ! landuse filename
   type(dyn_file_type), target   :: dynFatesLandUse_file
@@ -38,31 +45,32 @@ module dynFATESLandUseChangeMod
                     [character(len=5)  :: 'primf','primn','secdf','secdn','pastr','range', &
                                           'urban','c3ann','c4ann','c3per','c4per','c3nfx']
 
-  character(len=14), public, parameter :: landuse_transition_varnames(num_landuse_transition_vars) = &
-                    [character(len=14) :: 'primf_to_secdn','primf_to_pastr','primf_to_range','primf_to_urban', &
-                                          'primf_to_c3ann','primf_to_c4ann','primf_to_c3per','primf_to_c4per','primf_to_c3nfx', &
-                                          'primn_to_secdf','primn_to_pastr','primn_to_range','primn_to_urban', &
-                                          'primn_to_c3ann','primn_to_c4ann','primn_to_c3per','primn_to_c4per','primn_to_c3nfx', &
-                                          'secdf_to_secdn','secdf_to_pastr','secdf_to_range','secdf_to_urban', &
-                                          'secdf_to_c3ann','secdf_to_c4ann','secdf_to_c3per','secdf_to_c4per','secdf_to_c3nfx', &
-                                          'secdn_to_secdf','secdn_to_pastr','secdn_to_range','secdn_to_urban', &
-                                          'secdn_to_c3ann','secdn_to_c4ann','secdn_to_c3per','secdn_to_c4per','secdn_to_c3nfx', &
-                                          'pastr_to_secdf','pastr_to_secdn','pastr_to_range','pastr_to_urban', &
-                                          'pastr_to_c3ann','pastr_to_c4ann','pastr_to_c3per','pastr_to_c4per','pastr_to_c3nfx', &
-                                          'range_to_secdf','range_to_secdn','range_to_pastr','range_to_urban', &
-                                          'range_to_c3ann','range_to_c4ann','range_to_c3per','range_to_c4per','range_to_c3nfx', &
-                                          'urban_to_secdf','urban_to_secdn','urban_to_pastr','urban_to_range', &
-                                          'urban_to_c3ann','urban_to_c4ann','urban_to_c3per','urban_to_c4per','urban_to_c3nfx', &
-                                          'c3ann_to_c4ann','c3ann_to_c3per','c3ann_to_c4per','c3ann_to_c3nfx', &
-                                          'c3ann_to_secdf','c3ann_to_secdn','c3ann_to_pastr','c3ann_to_range','c3ann_to_urban', &
-                                          'c4ann_to_c3ann','c4ann_to_c3per','c4ann_to_c4per','c4ann_to_c3nfx', &
-                                          'c4ann_to_secdf','c4ann_to_secdn','c4ann_to_pastr','c4ann_to_range','c4ann_to_urban', &
-                                          'c3per_to_c3ann','c3per_to_c4ann','c3per_to_c4per','c3per_to_c3nfx', &
-                                          'c3per_to_secdf','c3per_to_secdn','c3per_to_pastr','c3per_to_range','c3per_to_urban', &
-                                          'c4per_to_c3ann','c4per_to_c4ann','c4per_to_c3per','c4per_to_c3nfx', &
-                                          'c4per_to_secdf','c4per_to_secdn','c4per_to_pastr','c4per_to_range','c4per_to_urban', &
-                                          'c3nfx_to_c3ann','c3nfx_to_c4ann','c3nfx_to_c3per','c3nfx_to_c4per', &
-                                          'c3nfx_to_secdf','c3nfx_to_secdn','c3nfx_to_pastr','c3nfx_to_range','c3nfx_to_urban']
+  character(len=14), public, parameter, allocatable :: landuse_transition_varnames(:)
+  !character(len=14), public, parameter :: landuse_transition_varnames(num_landuse_transition_vars) = &
+  !                  [character(len=14) :: 'primf_to_secdn','primf_to_pastr','primf_to_range','primf_to_urban', &
+  !                                        'primf_to_c3ann','primf_to_c4ann','primf_to_c3per','primf_to_c4per','primf_to_c3nfx', &
+  !                                        'primn_to_secdf','primn_to_pastr','primn_to_range','primn_to_urban', &
+  !                                        'primn_to_c3ann','primn_to_c4ann','primn_to_c3per','primn_to_c4per','primn_to_c3nfx', &
+  !                                        'secdf_to_secdn','secdf_to_pastr','secdf_to_range','secdf_to_urban', &
+  !                                        'secdf_to_c3ann','secdf_to_c4ann','secdf_to_c3per','secdf_to_c4per','secdf_to_c3nfx', &
+  !                                        'secdn_to_secdf','secdn_to_pastr','secdn_to_range','secdn_to_urban', &
+  !                                        'secdn_to_c3ann','secdn_to_c4ann','secdn_to_c3per','secdn_to_c4per','secdn_to_c3nfx', &
+  !                                        'pastr_to_secdf','pastr_to_secdn','pastr_to_range','pastr_to_urban', &
+  !                                        'pastr_to_c3ann','pastr_to_c4ann','pastr_to_c3per','pastr_to_c4per','pastr_to_c3nfx', &
+  !                                        'range_to_secdf','range_to_secdn','range_to_pastr','range_to_urban', &
+  !                                        'range_to_c3ann','range_to_c4ann','range_to_c3per','range_to_c4per','range_to_c3nfx', &
+  !                                        'urban_to_secdf','urban_to_secdn','urban_to_pastr','urban_to_range', &
+  !                                        'urban_to_c3ann','urban_to_c4ann','urban_to_c3per','urban_to_c4per','urban_to_c3nfx', &
+  !                                        'c3ann_to_c4ann','c3ann_to_c3per','c3ann_to_c4per','c3ann_to_c3nfx', &
+  !                                        'c3ann_to_secdf','c3ann_to_secdn','c3ann_to_pastr','c3ann_to_range','c3ann_to_urban', &
+  !                                        'c4ann_to_c3ann','c4ann_to_c3per','c4ann_to_c4per','c4ann_to_c3nfx', &
+  !                                        'c4ann_to_secdf','c4ann_to_secdn','c4ann_to_pastr','c4ann_to_range','c4ann_to_urban', &
+  !                                        'c3per_to_c3ann','c3per_to_c4ann','c3per_to_c4per','c3per_to_c3nfx', &
+  !                                        'c3per_to_secdf','c3per_to_secdn','c3per_to_pastr','c3per_to_range','c3per_to_urban', &
+  !                                        'c4per_to_c3ann','c4per_to_c4ann','c4per_to_c3per','c4per_to_c3nfx', &
+  !                                        'c4per_to_secdf','c4per_to_secdn','c4per_to_pastr','c4per_to_range','c4per_to_urban', &
+  !                                        'c3nfx_to_c3ann','c3nfx_to_c4ann','c3nfx_to_c3per','c3nfx_to_c4per', &
+  !                                        'c3nfx_to_secdf','c3nfx_to_secdn','c3nfx_to_pastr','c3nfx_to_range','c3nfx_to_urban']
 
   type(dyn_var_time_uninterp_type) :: landuse_transition_vars(num_landuse_transition_vars) ! value of each landuse variable
   type(dyn_var_time_uninterp_type) :: landuse_state_vars(num_landuse_state_vars)           ! value of each landuse variable
@@ -89,10 +97,12 @@ contains
     character(len=*) , intent(in) :: landuse_filename  ! name of file containing land use information
 
     ! !LOCAL VARIABLES
-    integer :: varnum, i      ! counter for harvest variables
+    integer :: varnum, i, j, iter      ! counter for harvest variables
     integer :: landuse_shape(1)  ! land use shape
     integer :: num_points ! number of spatial points
     integer :: ier        ! error code
+
+    character(len=14) :: tempvarname      ! temporary variable name
     real(r8), allocatable :: this_data(:) ! data for a single harvest variable
     !
     character(len=*), parameter :: subname = 'dynFatesLandUseInit'
@@ -100,9 +110,10 @@ contains
 
     SHR_ASSERT_ALL(bounds%level == BOUNDS_LEVEL_PROC, subname // ': argument must be PROC-level bounds')
 
-    if (use_cn) return ! Use this as a protection in lieu of build namelist check?
-
-    ! Allocate and initialize the land use arrays
+    ! Allocate and initialize the land use arrays and initialize to zero
+    ! This is allocated even if use_fates_luh is false as it is utilized via a use
+    ! statement in clmfates_interfacemod.F90.  This could be refactor to pass via
+    ! argument instead.
     allocate(landuse_states(num_landuse_state_vars,bounds%begg:bounds%endg),stat=ier)
     if (ier /= 0) then
        call endrun(msg=' allocation error for landuse_states'//errMsg(__FILE__, __LINE__))
@@ -114,6 +125,41 @@ contains
 
     landuse_states = 0._r8
     landuse_transitions = 0._r8
+
+    ! Allocate the landuse transition variable names array
+    allocate(landuse_transition_varnames(num_landuse_transition_vars,bounds%begg:bounds%endg),stat=ier)
+    if (ier /= 0) then
+       call endrun(msg=' allocation error for landuse_transitions'//errMsg(__FILE__, __LINE__))
+    end if
+
+    ! Populate the landuse transition variable names array
+    iter = 1
+    do i = 1, num_landuse_state_vars
+       do j = 1, num_landuse_state_vars
+
+          ! Get the land use state being transitioned "to"
+          tempvarname = trim(landuse_state_varnames(j))
+
+          ! Avoid self transitions or transitions into 'primf' or 'primn'
+          if (not(i == j .or. tempvarname(1:4) == 'prim') ) then
+
+             ! Build the transition name
+             tempvarname = trim(landuse_state_varnames(i))//'_to_'//trim(landuse_state_varnames(j))
+
+             ! 'primf' and 'primn' transition rultes to avoid
+             if (not(tempvarname == 'primf_to_secdf' .or. tempvarname == 'primn_to_secdn')) then
+                landuse_transition_varnames(iter) = tempvarname
+                iter = iter + 1
+             end if
+          end if
+       end do
+    end do
+
+    ! Check that all transition names were populated and end run if there is a mismatch
+    if (iter /= num_landuse_transition_vars) then
+       call endrun(msg=' number of landuse transition names, '//trim(num_landuse_transition_vars)//&
+                       ' does not match parameter value,'//trim(iter)//errMsg(__FILE__, __LINE__))
+    end if
 
     if (use_fates_luh) then
 
