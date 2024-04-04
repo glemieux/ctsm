@@ -43,5 +43,5 @@ jobs:
           "allow_deletions": false,
           "lock_branch": true
         }'
-    end:
+    env:
       REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
