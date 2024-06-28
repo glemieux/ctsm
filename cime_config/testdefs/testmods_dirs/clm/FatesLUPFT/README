@@ -1,0 +1,4 @@
+This test mod does not start from a cold a start.  It is currently
+intended to be used with the PVT system test to test running a 
+FATES spin-up using use_fates_potentialveg and then running a
+FATES tranisent land use mode with use_fates_lupft
