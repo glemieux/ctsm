@@ -28,10 +28,10 @@
 [submodule "fates"]
 path = src/fates
 url = https://github.com/glemieux/fates
-fxtag = submodule-fxtest
+fxtag = tool-landuse-submodule
 fxrequired = AlwaysRequired
 # Standard Fork to compare to with "git fleximod test" to ensure personal forks aren't committed
-fxDONOTUSEurl = https://github.com/glemieux/submodule-fxtest
+fxDONOTUSEurl = https://github.com/glemieux/fates
 
 [submodule "cism"]
 path = components/cism
