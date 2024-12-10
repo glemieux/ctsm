@@ -84,6 +84,7 @@ module CLMFatesInterfaceMod
    use clm_varpar        , only : nlevdecomp_full
    use clm_varpar        , only : nlevsoi
    use PhotosynthesisMod , only : photosyns_type
+   use PhotosynthesisMod , only : leafresp_method
    use PhotosynthesisMod , only : stomatalcond_method
    use PhotosynthesisMod , only : stomatalcond_mtd_bb1987
    use PhotosynthesisMod , only : stomatalcond_mtd_medlyn2011
@@ -548,6 +549,8 @@ module CLMFatesInterfaceMod
            pass_stomatal_assimilation = 2
         end if
         call set_fates_ctrlparms('stomatal_assim_model',ival=pass_stomatal_assimilation)
+
+        call set_fates_ctrlparms('maintresp_leaf_model',ival=leafresp_method)
 
         ! FATES logging and harvest modes
         pass_logging = 0
