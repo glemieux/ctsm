@@ -580,6 +580,13 @@ module CLMFatesInterfaceMod
         end if
         call set_fates_ctrlparms('hydr_solver',ival=pass_hydro_solver)
 
+        if (trim(fates_radiation_model) == 'norman') then
+           pass_radiation_model = 1
+        else if (trim(fates_hydro_solver) == 'twostream') then
+           pass_radiation_model = 2
+        end if
+        call set_fates_ctrlparms('radiation_model',ival=pass_radiation_model)
+
         ! FATES logging and harvest modes
         pass_logging = 0
         pass_lu_harvest = 0
