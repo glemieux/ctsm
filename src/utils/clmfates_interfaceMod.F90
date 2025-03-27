@@ -201,6 +201,9 @@ module CLMFatesInterfaceMod
    use dynFATESLandUseChangeMod, only : landuse_harvest_units
    use dynFATESLandUseChangeMod, only : landuse_harvest_varnames
 
+  use SoilBiogeochemCompetitionMod, only: suplnitro, suplnNon
+  use SoilBiogeochemCompetitionMod, only: suplphos, suplpNon
+
    implicit none
 
    type, public :: f2hmap_type
@@ -428,6 +431,8 @@ module CLMFatesInterfaceMod
      integer                                        :: pass_hydro_solver
      integer                                        :: pass_radiation_model
      integer                                        :: pass_electron_transport_model
+     integer                                        :: pass_nitrogen_supl
+     integer                                        :: pass_phosporus_supl
 
      call t_startf('fates_globals2')
 
@@ -488,7 +493,21 @@ module CLMFatesInterfaceMod
         ! Phosphorus is not tracked in CLM
         call set_fates_ctrlparms('phosphorus_spec',ival=0)
 
+        ! Pass the supplemental nutrient status flags
+        if (suplnitro == suplnNon) then
+           pass_nitrogen_supl = 0
+        else
+           pass_nitrogen_supl = 1
+        end if
+        if (suplphos == suplpNon) then
+           pass_phosporus_supl = 0
+        else
+           pass_phosporus_supl = 1
+        end if
+        call set_fates_ctrlparms('nitrogen_supl',ival=pass_nitrogen_supl)
+        call set_fates_ctrlparms('phosphorus_supl',ival=pass_phosporus_supl)
 
+        ! Pass the spitfire modes and ignition type values
         call set_fates_ctrlparms('spitfire_mode',ival=fates_spitfire_mode)
         call set_fates_ctrlparms('sf_nofire_def',ival=no_fire)
         call set_fates_ctrlparms('sf_scalar_lightning_def',ival=scalar_lightning)
