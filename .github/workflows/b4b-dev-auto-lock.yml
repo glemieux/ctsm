@@ -1,0 +1,47 @@
+name: Lock b4b-dev branch
+
+on:
+  schedule:
+    - cron: '30 23 * * SUN'
+  workflow_dispatch:
+
+jobs:
+  lock-branch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Lock b4b-dev branch
+      # curl command and REST data explanation
+      # -L: make curl follow a redirect to the location
+      # -X PUT: send "PUT" request
+      # -H Authorization: pass github "Authorization" header
+      # -H Accept: pass github "Accept" head
+      # -d: data to send
+      # required_status_checks: force branch to be up to date with base before merging
+      # enforce_admins: enforce all configurations given for admins
+      # required_pull_request_reviews: set PR requirements for merging
+      # restrictions: who can push to protected branch (users, teams, apps)
+      # allow_force_pushes
+      # allow_deletions
+      # lock_branch
+      run: |
+        curl -L \
+        -X PUT \
+        -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
+        -H "Accept: application/vnd.github+json" \
+        https://api.github.com/repos/${{ github.repository }}/branches/b4b-dev/protection \
+        -d '{
+          "required_status_checks": strict,
+          "enforce_admins": null,
+          "required_pull_request_reviews": {
+            "required_approving_review_count": 1
+            },
+          "restrictions": {
+            "users": ["glemieux"],
+            "teams": []
+          },
+          "allow_force_pushes": false,
+          "allow_deletions": false,
+          "lock_branch": true
+        }'
+    env:
+      REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
